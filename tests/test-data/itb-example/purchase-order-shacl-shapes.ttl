@@ -1,0 +1,73 @@
+@prefix po:  <http://itb.ec.europa.eu/sample/po#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+
+#
+# Rules for purchase orders
+#
+
+po:PurchaseOrderShape
+	a sh:NodeShape ;
+	sh:targetClass po:PurchaseOrder ;
+	sh:property po:shipToShape ;
+	sh:property po:billToShape ;
+	sh:property po:hasItemsShape .
+
+po:shipToShape
+	a sh:PropertyShape ;
+	sh:path po:shipTo ;
+	sh:minCount 1 ;
+	sh:maxCount 1 ;
+	sh:class locn:Address ;
+	sh:severity sh:Violation .
+
+po:billToShape
+	a sh:PropertyShape ;
+	sh:path po:billTo ;
+	sh:class locn:Address ;
+	sh:maxCount 1 ;
+	sh:severity sh:Violation .
+
+ po:hasItemsShape
+ 	a sh:PropertyShape ;
+	sh:path po:hasItem ;
+	sh:minCount 1 ;
+	sh:class po:Item ;
+	sh:severity sh:Violation .
+
+#
+# Rules for purchase order items
+#
+
+po:ItemShape
+	a sh:NodeShape ;
+	sh:targetClass po:Item ;
+	sh:property po:productNameShape ;
+	sh:property po:quantityShape ;
+	sh:property po:priceShape .
+
+po:productNameShape
+	a sh:PropertyShape ;
+	sh:path po:productName ;
+	sh:minCount 1 ;
+	sh:maxCount 1 ;
+	sh:nodeKind sh:Literal ;
+	sh:severity sh:Violation .
+
+po:quantityShape
+	a sh:PropertyShape ;
+	sh:path po:quantity ;
+	sh:minCount 1 ;
+	sh:maxCount 1 ;
+	sh:datatype xsd:integer ;
+	sh:minExclusive 0 ;
+	sh:severity sh:Violation .
+
+po:priceShape
+	a sh:PropertyShape ;
+	sh:path po:priceEUR ;
+	sh:minCount 1 ;
+	sh:maxCount 1 ;
+	sh:datatype xsd:decimal ;
+	sh:severity sh:Violation .

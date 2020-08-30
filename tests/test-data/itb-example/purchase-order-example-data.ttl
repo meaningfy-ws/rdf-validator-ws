@@ -1,0 +1,30 @@
+@prefix ns0: <http://www.w3.org/ns/locn#> .
+@prefix ns1: <http://itb.ec.europa.eu/sample/po#> .
+
+<http://my.sample.po/po#purchaseOrder>
+  a <http://itb.ec.europa.eu/sample/po#PurchaseOrder> ;
+  ns1:shipTo <http://my.sample.po/po#home> ;
+  ns1:billTo <http://my.sample.po/po#home> ;
+  ns1:hasItem <http://my.sample.po/po#item1>;
+  ns1:hasItem  <http://my.sample.po/po#item2> .
+
+<http://my.sample.po/po#home>
+  a <http://www.w3.org/ns/locn#Address> ;
+  ns0:fullAddress "Rue du Test 123, 1000 - Brussels, Belgium" ;
+  ns0:thoroughfare "Rue du Test" ;
+  ns0:locatorDesignator "123" ;
+  ns0:postCode "1000" ;
+  ns0:postName "Brussels" ;
+  ns0:adminUnitL1 "BE" .
+
+<http://my.sample.po/po#item1>
+  a ns1:Item ;
+  ns1:productName "Mouse" ;
+  ns1:quantity 20 ;
+  ns1:priceEUR 15.99 .
+
+<http://my.sample.po/po#item2>
+  a ns1:Item ;
+  ns1:productName "Keyboard" ;
+  ns1:quantity 15 ;
+  ns1:priceEUR 25.50 .

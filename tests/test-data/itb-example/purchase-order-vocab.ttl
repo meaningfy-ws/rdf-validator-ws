@@ -1,0 +1,86 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://itb.ec.europa.eu/sample/po#>
+  a owl:Ontology ;
+  dc:title "EU Purchase Orders" ;
+  dc:description "An example ontology for EU Purchase Orders" .
+
+#
+# Classes
+#
+
+<http://itb.ec.europa.eu/sample/po#PurchaseOrder>
+  a rdfs:Class ;
+  rdfs:label "PurchaseOrder"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:subClassOf rdfs:Resource ;
+  dc:identifier "po:PurchaseOrder" .
+
+<http://itb.ec.europa.eu/sample/po#Item>
+  a rdfs:Class ;
+  rdfs:label "Item"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:subClassOf rdfs:Resource ;
+  dc:identifier "po:Item" .
+
+#
+# PurchaseOrder properties
+#
+
+<http://itb.ec.europa.eu/sample/po#shipTo>
+  a rdf:Property ;
+  rdfs:label "shipTo"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:domain <http://itb.ec.europa.eu/sample/po#PurchaseOrder> ;
+  rdfs:range <http://www.w3.org/ns/locn#Address> ;
+  rdfs:subPropertyOf <http://www.w3.org/ns/locn#address> ;
+  dc:identifier "po:shipTo" .
+
+<http://itb.ec.europa.eu/sample/po#billTo>
+  a rdf:Property ;
+  rdfs:label "billTo"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:domain <http://itb.ec.europa.eu/sample/po#PurchaseOrder> ;
+  rdfs:range <http://www.w3.org/ns/locn#Address> ;
+  rdfs:subPropertyOf <http://www.w3.org/ns/locn#address> ;
+  dc:identifier "po:billTo" .
+
+<http://itb.ec.europa.eu/sample/po#hasItem>
+  a rdf:Property ;
+  rdfs:label "hasItems"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:domain <http://itb.ec.europa.eu/sample/po#PurchaseOrder> ;
+  rdfs:range <http://itb.ec.europa.eu/sample/po#Item> ;
+  dc:identifier "po:hasItem" .
+
+#
+# Item properties
+#
+
+<http://itb.ec.europa.eu/sample/po#productName>
+  a rdf:Property ;
+  rdfs:label "productName"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:domain <http://itb.ec.europa.eu/sample/po#Item> ;
+  rdfs:range rdfs:Literal ;
+  dc:identifier "po:productName" .
+
+<http://itb.ec.europa.eu/sample/po#quantity>
+  a rdf:Property ;
+  rdfs:label "quantity"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:domain <http://itb.ec.europa.eu/sample/po#Item> ;
+  rdfs:range xsd:positiveInteger ;
+  dc:identifier "po:quantity" .
+
+<http://itb.ec.europa.eu/sample/po#price>
+  a rdf:Property ;
+  rdfs:label "price"@en ;
+  rdfs:isDefinedBy <http://itb.ec.europa.eu/sample/po#> ;
+  rdfs:domain <http://itb.ec.europa.eu/sample/po#Item> ;
+  rdfs:range xsd:decimal ;
+  dc:identifier "po:price" .
