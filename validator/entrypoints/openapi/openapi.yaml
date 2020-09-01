@@ -1,0 +1,66 @@
+openapi: 3.0.1
+
+info:
+  title: RDF Diffing Service
+  description: |
+    This API provides the possibility to validate an RDF file or SPARQL endpoint.
+
+    Current implementation is based on the [RDFUnit tool](https://github.com/AKSW/RDFUnit/).
+
+  contact:
+    name: Eugeniu Costetchi
+    url: http://costezki.ro
+    email: costezki.eugen@gmail.com
+  license:
+    name: GNU General Public License Version 3 (GPLv3)
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.1
+
+servers:
+  - url: 'http://localhost:3031/'
+    description: Default development server
+
+paths:
+  /validate-endpoint:
+    post:
+      operationId: validate-endpoint
+      description: Validate a
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                dataset_uri:
+                  type: string
+                  description: The dataset URI.
+                endpoint_url:
+                  type: string
+                  description: The ednpoint to validate
+                graphs:
+                  type: array
+                  description: An optional list of named graphs to restrict the scope of the validation
+                  items:
+                    type: string
+                schema_files:
+                  type: array
+                  description: The list of SHACL shape files defining the validation constraints.
+                  items:
+                    type: object
+                    properties:
+                      file_name:
+                        type: string
+                        description: The name of the SHACL file
+                      file_content:
+                        type: string
+                        format: binary
+                        description: The content of the SHACL file
+              required:
+                - endpoint_url
+                - schema_files
+      responses:
+        200:
+          description: Request to validate endpoint successfully accepted for processing.
+        5XX:
+          description: Unexpected Error.
