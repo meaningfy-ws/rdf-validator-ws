@@ -17,6 +17,8 @@ def run_validator(inputs, output: Path) -> None:
     :type inputs: object
     :return:
     """
+    # what test data should we use:
+    # see tests/test-data/rdfunit-example and itb-example; the output reports might have problems
 
 
 def generate_validation_report(path_to_report: Path, output: Path) -> None:

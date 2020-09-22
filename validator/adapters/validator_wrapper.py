@@ -8,25 +8,48 @@
 """ This module implements wrappers around a external RDF validation tools. """
 
 import abc
+import logging
+from subprocess import Popen, PIPE
+
+
+class SubprocessFailure(Exception):
+    """
+        An exception for SKOSHistoryRunner.
+    """
 
 
 class AbstractValidatorWrapper(abc.ABC):
+    __FULL_PATH_TO_SCRIPT__: str
 
     @abc.abstractmethod
-    def run(self):
+    def __init__(self, full_path_to_script):
+        self.__FULL_PATH_TO_SCRIPT__ = full_path_to_script
+
+    @abc.abstractmethod
+    def run(self, *args):
         pass
 
-    def execute_subprocess(self):
-        """
-            TODO: implement subprocess execution in a generic way, +exception handling, then call it in the `run`
-        :return:
-        """
+    def execute_subprocess(self, *args):
+        logging.info('Subprocess starting: ' + self.__FULL_PATH_TO_SCRIPT__)
+
+        process = Popen(
+            [self.__FULL_PATH_TO_SCRIPT__, args],
+            stdout=PIPE)
+        output, _ = process.communicate()
+
+        if process.returncode != 0:
+            logging.fatal('Subprocess failed: ' + self.__FULL_PATH_TO_SCRIPT__)
+            logging.fatal(f'Subprocess: {output.decode()}')
+            raise SubprocessFailure(output)
+
+        logging.info('Subprocess finished successfully: ' + self.__FULL_PATH_TO_SCRIPT__)
+        return output.decode()
 
 
 class RDFUnitWrapper(AbstractValidatorWrapper):
 
-    def __init__(self):
-        pass
+    def __init__(self, full_path_to_script):
+        super().__init__(full_path_to_script)
 
-    def run(self):
-        pass
+    def run(self, *args):
+        self.execute_subprocess(args)
