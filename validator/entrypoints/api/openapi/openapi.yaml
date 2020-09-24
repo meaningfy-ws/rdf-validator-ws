@@ -23,7 +23,7 @@ servers:
 paths:
   /validate-endpoint:
     post:
-      operationId: validate-endpoint
+      operationId: validator.entrypoints.api.handlers.validate_endpoint
       description: Validate a
       requestBody:
         required: true
@@ -37,7 +37,7 @@ paths:
                   description: The dataset URI.
                 endpoint_url:
                   type: string
-                  description: The ednpoint to validate
+                  description: The endpoint to validate
                 graphs:
                   type: array
                   description: An optional list of named graphs to restrict the scope of the validation

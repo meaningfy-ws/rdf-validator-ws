@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  itb:
+    build: ./itb
+    container_name: generic-validator
+    ports:
+      - 9090:8080
+
+  validator-api:
+    container_name: validator-api
+    build: .
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
+    env_file: .env.prod

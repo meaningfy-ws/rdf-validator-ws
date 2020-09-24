@@ -1,31 +1,51 @@
 .PHONY: test install lint generate-tests-from-features
 
-include .env-dev
+include .env.dev
 
 BUILD_PRINT = \e[1;34mSTEP: \e[0m
 
 #-----------------------------------------------------------------------------
-# Fuseki related commands
+# Basic commands
 #-----------------------------------------------------------------------------
 
-start-fuseki:
-	@ echo "$(BUILD_PRINT)Starting Fuseki on port $(if $(FUSEKI_PORT),$(FUSEKI_PORT),'default port')"
-	@ docker-compose --file docker-compose.yml --env-file .env-dev up -d fuseki
+install-prod:
+	@ echo "$(BUILD_PRINT)Installing the production requirements"
+	@ pip install --upgrade pip
+	@ pip install -r requirements.txt
 
-stop-fuseki:
-	@ echo "$(BUILD_PRINT)Stopping Fuseki"
-	@ docker-compose --file docker-compose.yml --env-file .env-dev down
+install-dev:
+	@ echo "$(BUILD_PRINT)Installing the development requirements"
+	@ pip install --upgrade pip
+	@ pip install -r requirements/dev.txt
 
-fuseki-create-test-dbs:
-	@ echo "$(BUILD_PRINT)Building dummy "subdiv" and "abc" datasets at http://localhost:$(if $(FUSEKI_PORT),$(FUSEKI_PORT),unknown port)/$$/datasets"
-	@ sleep 2
-	@ curl --anyauth --user 'admin:admin' -d 'dbType=mem&dbName=subdiv'  'http://localhost:$(FUSEKI_PORT)/$$/datasets'
-	@ curl --anyauth --user 'admin:admin' -d 'dbType=mem&dbName=abc'  'http://localhost:$(FUSEKI_PORT)/$$/datasets'
+test:
+	@ echo "$(BUILD_PRINT)Running the tests"
+	@ pytest
 
-clean-data:
-	@ echo "$(BUILD_PRINT)Deleting the $(DATA_FOLDER)"
-	@ sudo rm -rf $(DATA_FOLDER)
+#-----------------------------------------------------------------------------
+# API server related commands
+#-----------------------------------------------------------------------------
 
-start-service: start-fuseki fuseki-create-test-dbs
+build-dev-api:
+	@ echo -e '$(BUILD_PRINT)Building the dev container'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev build validator-api
 
-stop-service: stop-fuseki clean-data
+run-dev-api:
+	@ echo -e '$(BUILD_PRINT)Starting the dev services'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev up validator-api -d
+
+#-----------------------------------------------------------------------------
+# (all) Development environment
+#-----------------------------------------------------------------------------
+
+build-dev:
+	@ echo -e '$(BUILD_PRINT)Building the dev container'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev build
+
+run-dev:
+	@ echo -e '$(BUILD_PRINT)Starting the dev services'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev up -d
+
+stop-dev:
+	@ echo -e '$(BUILD_PRINT)Stopping the dev services'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev down
