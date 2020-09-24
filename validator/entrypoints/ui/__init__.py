@@ -5,4 +5,17 @@
 # Author: Eugeniu Costetchi
 # Email: costezki.eugen@gmail.com 
 
-""" """
+"""
+"""
+
+from flask import Flask
+from flask_bootstrap import Bootstrap
+
+from .config import FLASK_SECRET_KEY
+
+app = Flask(__name__)
+Bootstrap(app)
+
+app.config['SECRET_KEY'] = FLASK_SECRET_KEY
+
+from . import views
