@@ -19,37 +19,37 @@ class SubprocessFailure(Exception):
 
 
 class AbstractValidatorWrapper(abc.ABC):
-    __FULL_PATH_TO_SCRIPT__: str
+    __COMMAND__: str
 
     @abc.abstractmethod
-    def __init__(self, full_path_to_script):
-        self.__FULL_PATH_TO_SCRIPT__ = full_path_to_script
+    def __init__(self, command):
+        self.__COMMAND__ = command
 
     @abc.abstractmethod
     def run(self, *args):
         pass
 
     def execute_subprocess(self, *args):
-        logging.info('Subprocess starting: ' + self.__FULL_PATH_TO_SCRIPT__)
+        logging.info('Subprocess starting: ' + self.__COMMAND__)
 
         process = Popen(
-            [self.__FULL_PATH_TO_SCRIPT__, args],
+            [self.__COMMAND__, args],
             stdout=PIPE)
         output, _ = process.communicate()
 
         if process.returncode != 0:
-            logging.fatal('Subprocess failed: ' + self.__FULL_PATH_TO_SCRIPT__)
+            logging.fatal('Subprocess failed: ' + self.__COMMAND__)
             logging.fatal(f'Subprocess: {output.decode()}')
             raise SubprocessFailure(output)
 
-        logging.info('Subprocess finished successfully: ' + self.__FULL_PATH_TO_SCRIPT__)
+        logging.info('Subprocess finished successfully: ' + self.__COMMAND__)
         return output.decode()
 
 
 class RDFUnitWrapper(AbstractValidatorWrapper):
 
-    def __init__(self, full_path_to_script):
-        super().__init__(full_path_to_script)
+    def __init__(self, command):
+        super().__init__(command)
 
     def run(self, *args):
         self.execute_subprocess(args)

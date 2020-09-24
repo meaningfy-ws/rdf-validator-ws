@@ -18,7 +18,7 @@ Read more documentation on configuring the RDF validator [here](https://www.itb.
 
 
 # use cases 
-Case 1 parameters: 
+* Case 1 parameters:
 - dataset URI 1..1
 - graph 0..*
 - SPARQL endpoint 1..1
@@ -33,7 +33,7 @@ Case 2 parameters:
 
 Case 3 parameters: 
 - dataset URI 1..1
-- source URI 1..*
+- source URI 1..* (sure it's * ??)
 - schemas 1..*
 
 Output:
