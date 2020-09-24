@@ -17,7 +17,7 @@ info:
   version: 1.0.1
 
 servers:
-  - url: 'http://localhost:3031/'
+  - url: 'http://localhost:3040/'
     description: Default development server
 
 paths:
@@ -47,15 +47,9 @@ paths:
                   type: array
                   description: The list of SHACL shape files defining the validation constraints.
                   items:
-                    type: object
-                    properties:
-                      file_name:
-                        type: string
-                        description: The name of the SHACL file
-                      file_content:
-                        type: string
-                        format: binary
-                        description: The content of the SHACL file
+                    type: string
+                    format: binary
+                    description: The content of the SHACL file
               required:
                 - endpoint_url
                 - schema_files
