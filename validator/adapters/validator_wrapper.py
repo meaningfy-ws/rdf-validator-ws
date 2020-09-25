@@ -23,6 +23,7 @@ class AbstractValidatorWrapper(abc.ABC):
 
     @abc.abstractmethod
     def __init__(self, command):
+        self.__logger = logging.getLogger(__name__)
         self.__COMMAND__ = command
 
     @abc.abstractmethod
@@ -30,7 +31,7 @@ class AbstractValidatorWrapper(abc.ABC):
         pass
 
     def execute_subprocess(self, *args):
-        logging.info('Subprocess starting: ' + self.__COMMAND__)
+        self.__logger.info('Subprocess starting: ' + self.__COMMAND__)
 
         process = Popen(
             [self.__COMMAND__, args],
@@ -38,11 +39,11 @@ class AbstractValidatorWrapper(abc.ABC):
         output, _ = process.communicate()
 
         if process.returncode != 0:
-            logging.fatal('Subprocess failed: ' + self.__COMMAND__)
-            logging.fatal(f'Subprocess: {output.decode()}')
+            self.__logger.fatal('Subprocess failed: ' + self.__COMMAND__)
+            self.__logger.fatal(f'Subprocess: {output.decode()}')
             raise SubprocessFailure(output)
 
-        logging.info('Subprocess finished successfully: ' + self.__COMMAND__)
+        self.__logger.info('Subprocess finished successfully: ' + self.__COMMAND__)
         return output.decode()
 
 

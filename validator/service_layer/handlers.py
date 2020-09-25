@@ -2,17 +2,28 @@
 
 # service.py
 # Date:  21/09/2020
-# Author: Eugeniu Costetchi
-# Email: costezki.eugen@gmail.com 
+# Author: Laurentiu Mandru
+# Email: mclaurentiu79@gmail.com
 
 """ """
 import logging
+import pathlib
+from distutils.dir_util import copy_tree
 from pathlib import Path
 from typing import List
 
+from eds4jinja2.builders.report_builder import ReportBuilder
+
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
 
-logger = logging.getLogger(__name__)
+__logger = logging.getLogger(__name__)
+
+
+def __copy_static_content(from_path, to_path):
+    if pathlib.Path(from_path).is_dir():
+        copy_tree(from_path,to_path)
+    else:
+        __logger.warning(from_path + " is not a directory !")
 
 
 def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], output: Path) -> None:
@@ -30,10 +41,10 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
     # what test data should we use:
     # see tests/test-data/rdfunit-example and itb-example; the output reports might have problems
     if dataset_uri != data_file:
-        logger.fatal("dataset_uri must the same as data_file")
+        __logger.fatal("dataset_uri must the same as data_file")
         raise Exception("dataset_uri must the same as data_file")
 
-    logging.info("RDFUnitWrapper' starting ...")
+    __logger.info("RDFUnitWrapper' starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("docker")
     cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
@@ -41,7 +52,7 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
                                                       " -u ", data_file,
                                                       " -s ", ", ".join([schema for schema in schemas]),
                                                       " -f ", str(output))
-    logging.info("RDFUnitWrapper finished with output:\n" + cli_output)
+    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 
 
 def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: List[str], output: Path) -> None:
@@ -58,7 +69,7 @@ def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: Li
     # what test data should we use:
     # see tests/test-data/rdfunit-example and itb-example; the output reports might have problems
 
-    logging.info("RDFUnitWrapper' starting ...")
+    __logger.info("RDFUnitWrapper' starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("docker")
 
@@ -70,7 +81,7 @@ def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: Li
                                                           [schema for schema in schemas]),
                                                       " -f " + str(output)
                                                       )
-    logging.info("RDFUnitWrapper finished with output:\n" + cli_output)
+    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 
 
 def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, graphs_uris: List[str],
@@ -89,7 +100,7 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     # what test data should we use:
     # see tests/test-data/rdfunit-example and itb-example; the output reports might have problems
 
-    logging.info("RDFUnitWrapper' starting ...")
+    __logger.info("RDFUnitWrapper' starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("docker")
     cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
@@ -99,7 +110,7 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
                                                       "" if (len(graphs_uris) is 0) else ", ".join([graph for graph in graphs_uris]),
                                                       " -s ", ", ".join([schema for schema in schemas]),
                                                       " -f ",  str(output))
-    logging.info("RDFUnitWrapper finished with output:\n" + cli_output)
+    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 
 
 def generate_validation_report(path_to_report: Path, output: Path) -> None:
@@ -113,3 +124,8 @@ def generate_validation_report(path_to_report: Path, output: Path) -> None:
     :param path_to_report:
     :return:
     """
+    report_builder = ReportBuilder(path_to_report, output)
+    report_builder.add_after_rendering_listener(__copy_static_content)
+    report_builder.make_document()
+
+
