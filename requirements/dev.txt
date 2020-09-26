@@ -1,0 +1,7 @@
+-r common.txt
+
+# Testing Dependencies
+pytest
+coverage
+pytest-cov
+pytest-bdd

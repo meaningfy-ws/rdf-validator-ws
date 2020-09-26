@@ -1,0 +1,3 @@
+requests
+connexion[swagger-ui]
+git+https://github.com/meaningfy-ws/eds4jinja2
