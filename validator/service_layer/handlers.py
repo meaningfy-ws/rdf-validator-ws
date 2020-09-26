@@ -30,21 +30,19 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
     """
         Execute the RDF Unit or any other validator.
         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
-    :param data_file:
-    :param schemas:
-    :param data_files:
-    :param dataset_uri:
-    :param output:
-    :type inputs: object
-    :return:
-    """
-    # what test data should we use:
-    # see tests/test-data/rdfunit-example and itb-example; the output reports might have problems
-    if dataset_uri != data_file:
-        __logger.fatal("dataset_uri must the same as data_file")
-        raise Exception("dataset_uri must the same as data_file")
+    :param data_file: defines the actual location of the file
+    :param schemas: schemas also required for running an evaluation
+    :param dataset_uri: states a URI that relates to the tested dataset
+    :param output: the output directory
+    :return: nothing
 
-    __logger.info("RDFUnitWrapper' starting ...")
+    Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
+    """
+    if dataset_uri != data_file:
+        __logger.fatal("dataset_uri must be the same as data_file")
+        raise Exception("dataset_uri must be the same as data_file")
+
+    __logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("docker")
     cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
@@ -59,15 +57,14 @@ def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: Li
     """
         Execute the RDF Unit or any other validator.
         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
-    :param graphs_uris:
-    :param dataset_uri:
-    :param schemas:
-    :param output:
-    :type inputs: object
-    :return:
+    :param graphs_uris: the URIs of the graphs
+    :param dataset_uri: states a URI that relates to the tested dataset
+    :param schemas: schemas also required for running an evaluation
+    :param output: the output directory
+    :return: nothing
+
+    Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
-    # what test data should we use:
-    # see tests/test-data/rdfunit-example and itb-example; the output reports might have problems
 
     __logger.info("RDFUnitWrapper' starting ...")
     validator_wrapper: AbstractValidatorWrapper
@@ -89,16 +86,15 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     """
         Execute the RDF Unit or any other validator.
         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
-    :param sparql_endpoint_uri:
-    :param dataset_uri:
-    :param graphs_uris:
-    :param schemas:
-    :param output:
-    :type inputs: object
-    :return:
+    :param sparql_endpoint_uri: You can run RDFUnit directly on a SPARQL endpoint using this parameter
+    :param dataset_uri: states a URI that relates to the tested dataset
+    :param graphs_uris: the URIs of the graphs
+    :param schemas: schemas also required for running an evaluation
+    :param output: the output directory
+    :return: nothing
+
+    Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
-    # what test data should we use:
-    # see tests/test-data/rdfunit-example and itb-example; the output reports might have problems
 
     __logger.info("RDFUnitWrapper' starting ...")
     validator_wrapper: AbstractValidatorWrapper
@@ -120,10 +116,11 @@ def generate_validation_report(path_to_report: Path, output: Path) -> None:
         Possibilities: (a) either write a new DataSourceAdapter in the eds4jinja project or
                        (b) use a temporary Fuseki instance,w here the validation report is
                        loaded and the report is generated from there.  (For this we have to write a Fuseki adapter)
-    :param output:
-    :param path_to_report:
-    :return:
+    :param output: the output directory
+    :param path_to_report: the location of the template file(s) that will be used to render the output
+    :return: nothing
     """
+    
     report_builder = ReportBuilder(path_to_report, output)
     report_builder.add_after_rendering_listener(__copy_static_content)
     report_builder.make_document()
