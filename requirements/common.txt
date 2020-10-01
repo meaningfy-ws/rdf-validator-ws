@@ -1,3 +1,5 @@
 requests
 connexion[swagger-ui]
+
+rdflib
 git+https://github.com/meaningfy-ws/eds4jinja2

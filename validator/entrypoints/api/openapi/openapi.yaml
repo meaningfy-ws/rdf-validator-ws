@@ -21,10 +21,10 @@ servers:
     description: Default development server
 
 paths:
-  /validate-endpoint:
+  /validate-file:
     post:
-      operationId: validator.entrypoints.api.handlers.validate_endpoint
-      description: Validate a
+      operationId: validator.entrypoints.api.handlers.validate_file
+      description: Validate a an RDF file with the provided SHACL shapes.
       requestBody:
         required: true
         content:
@@ -34,8 +34,39 @@ paths:
               properties:
                 dataset_uri:
                   type: string
-                  description: The dataset URI.
-                endpoint_url:
+                  description: The dataset URI 
+                data_file:
+                  type: string
+                  format: binary
+                  description: The data content to validate
+                schema_file:
+                  type: string
+                  format: binary
+                  description: The content of the SHACL shape files defining the validation constraints
+              required:
+                  - dataset_uri
+                  - data_file
+                  - schema_file
+      responses:
+        200:
+          description: Request to validate endpoint successfully accepted for processing.
+        5XX:
+          description: Unexpected Error.
+  /validate-sparql-endpoint:
+    post:
+      operationId: validator.entrypoints.api.handlers.validate_sparql_endpoint
+      description: Validate a sparql endpoint with the provided SHACL shapes and optionally restricted to provided graphs.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                dataset_uri:
+                  type: string
+                  description: The dataset URI
+                sparql_endpoint_url:
                   type: string
                   description: The endpoint to validate
                 graphs:
@@ -43,16 +74,14 @@ paths:
                   description: An optional list of named graphs to restrict the scope of the validation
                   items:
                     type: string
-                schema_files:
-                  type: array
-                  description: The list of SHACL shape files defining the validation constraints.
-                  items:
-                    type: string
-                    format: binary
-                    description: The content of the SHACL file
+                schema_file:
+                  type: string
+                  format: binary
+                  description: The content of the SHACL shape files defining the validation constraints
               required:
-                - endpoint_url
-                - schema_files
+                  - dataset_uri
+                  - sparql_endpoint_url
+                  - schema_file
       responses:
         200:
           description: Request to validate endpoint successfully accepted for processing.

@@ -27,12 +27,32 @@ test:
 #-----------------------------------------------------------------------------
 
 build-dev-api:
-	@ echo -e '$(BUILD_PRINT)Building the dev container'
+	@ echo -e '$(BUILD_PRINT)Building the api container'
 	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev build validator-api
 
 run-dev-api:
-	@ echo -e '$(BUILD_PRINT)Starting the dev services'
-	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev up validator-api -d
+	@ echo -e '$(BUILD_PRINT)Starting the api container'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev up -d validator-api
+
+stop-dev-api:
+	@ echo -e '$(BUILD_PRINT)Stopping the api container'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev stop validator-api
+
+#-----------------------------------------------------------------------------
+# UI server related commands
+#-----------------------------------------------------------------------------
+
+build-dev-ui:
+	@ echo -e '$(BUILD_PRINT)Building the ui container'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev build validator-ui
+
+run-dev-ui:
+	@ echo -e '$(BUILD_PRINT)Starting the ui container'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev up -d validator-ui
+
+stop-dev-ui:
+	@ echo -e '$(BUILD_PRINT)Stopping the ui container'
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev stop validator-ui
 
 #-----------------------------------------------------------------------------
 # (all) Development environment
@@ -48,4 +68,4 @@ run-dev:
 
 stop-dev:
 	@ echo -e '$(BUILD_PRINT)Stopping the dev services'
-	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev down
+	@ docker-compose --file docker-compose.dev.yml --env-file .env.dev stop

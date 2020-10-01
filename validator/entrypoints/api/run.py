@@ -6,15 +6,13 @@
 # Email: coslet.mihai@gmail.com
 
 """
-API server through connexion definitions
+Production API server through connexion definitions.
 """
 
-import connexion
+from validator.entrypoints.api import app
+from validator.entrypoints.manage import ProductionConfig
 
-connexion_app = connexion.FlaskApp(__name__, specification_dir='openapi')
-connexion_app.add_api('openapi.yaml')
-
-app = connexion_app.app
+app.config.from_object(ProductionConfig())
 
 if __name__ == '__main__':
     app.run()
