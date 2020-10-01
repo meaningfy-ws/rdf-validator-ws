@@ -9,6 +9,7 @@
 Test connexion/flask api views.
 """
 from io import BytesIO
+from unittest.mock import patch
 
 import pytest
 from werkzeug.datastructures import FileStorage
@@ -16,16 +17,20 @@ from werkzeug.datastructures import FileStorage
 
 @pytest.mark.parametrize("filename",
                          ['test.rdf', 'test.trix', 'test.nq', 'test.nt', 'test.ttl', 'test.n3', 'test.jsonld'])
-def test_validate_file_file_type_success(filename, api_client):
+# @patch('validator.entrypoints.api.handlers.run_file_validator')
+def test_validate_file_success(filename, api_client):
+    # mock_run_file_validator.return_value = {'data': FileStorage(BytesIO(b'validation'), 'validation.ttl')}
+
     data = {
         'dataset_uri': 'http://hello',
-        'data_file': FileStorage(BytesIO(b''), filename),
-        'schema_file': FileStorage(BytesIO(b''), filename)
+        'data_file': FileStorage(BytesIO(b'data file content'), filename),
+        'schema_file': FileStorage(BytesIO(b''), 'schema_' + filename)
 
     }
     response = api_client.post('/validate-file', data=data, content_type='multipart/form-data')
 
     assert response.status_code == 200
+    assert 'data file content' in response.data.decode()
 
 
 def test_validate_file_type_exception_one(api_client):
@@ -38,7 +43,7 @@ def test_validate_file_type_exception_one(api_client):
     }
     response = api_client.post('/validate-file', data=data, content_type='multipart/form-data')
 
-    assert response.status_code == 422
+    assert response.status_code == 415
     assert unacceptable_filename in response.json.get('detail')
 
 
@@ -53,6 +58,36 @@ def test_validate_file_type_exception_two(api_client):
     }
     response = api_client.post('/validate-file', data=data, content_type='multipart/form-data')
 
-    assert response.status_code == 422
+    assert response.status_code == 415
     assert unacceptable_filename_1 in response.json.get('detail')
     assert unacceptable_filename_2 in response.json.get('detail')
+
+
+@pytest.mark.parametrize("filename",
+                         ['shapes.rdf', 'shapes.trix', 'shapes.nq', 'shapes.nt',
+                          'shapes.ttl', 'shapes.n3', 'shapes.jsonld'])
+def test_validate_sparql_endpoint_success(filename, api_client):
+    data = {
+        'dataset_uri': 'http://hello',
+        'schema_file': FileStorage(BytesIO(b'shape file content'), filename),
+        'graphs': ['shape1', 'shape2'],
+        'sparql_endpoint_url': 'http://sparql.endpoint'
+    }
+    response = api_client.post('/validate-sparql-endpoint', data=data, content_type='multipart/form-data')
+
+    assert response.status_code == 200
+    assert 'shape file content' in response.data.decode()
+
+
+def test_validate_sparql_endpoint_schema_file_type_exception(api_client):
+    unacceptable_filename = 'schema_file.pdf'
+    data = {
+        'dataset_uri': 'http://hello',
+        'schema_file': FileStorage(BytesIO(b'data file content'), unacceptable_filename),
+        'graphs': ['shape1', 'shape2'],
+        'sparql_endpoint_url': 'http://sparql.endpoint'
+    }
+    response = api_client.post('/validate-sparql-endpoint', data=data, content_type='multipart/form-data')
+
+    assert response.status_code == 415
+    assert unacceptable_filename in response.data.decode()

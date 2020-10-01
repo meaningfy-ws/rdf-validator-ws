@@ -11,37 +11,23 @@ OpenAPI method handlers.
 import tempfile
 from pathlib import Path
 
-from rdflib.util import guess_format
+from flask import send_from_directory
 from werkzeug.datastructures import FileStorage
-from werkzeug.exceptions import UnprocessableEntity
+from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 
-from validator.service_layer.handlers import run_file_validator
-
-INPUT_MIME_TYPES = {
-    'rdf': 'application/rdf+xml',
-    'trix': 'application/xml',
-    'nq': 'application/n-quads',
-    'nt': 'application/n-triples',
-    'jsonld': 'application/ld+json',
-    'n3': 'text/n3',
-    'ttl': 'text/turtle',
-}
+from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES
+from validator.service_layer.handlers import run_file_validator, run_sparql_endpoint_validator
 
 
-def _guess_file_type(file: str, accepted_types: dict = None):
-    if accepted_types is None:
-        accepted_types = INPUT_MIME_TYPES
-    return guess_format(str(file), accepted_types)
-
-
-def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage):
+def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) -> tuple:
     """
     API method to handle file validation.
     :param body: a dictionary with the fields:
         :dataset_uri - The dataset URI
     :param data_file: The file to be validated
     :param schema_file: The content of the SHACL shape files defining the validation constraints
-    :return:
+    :return: the validation ttl file
+    :rtype: ttl file, int
     """
     dataset_uri = body.get('dataset_uri')
 
@@ -52,53 +38,57 @@ def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage):
     if file_exceptions:
         exception_text = 'File type errors: ' + ', '.join(file_exceptions) + '. Acceptable types: ' + \
                          ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
-        raise UnprocessableEntity(exception_text)
+        raise UnsupportedMediaType(exception_text)
 
-    # with tempfile.TemporaryDirectory() as temp_folder:
-    #     file = Path(temp_folder) / str(data_file.filename)
-    #     data_file.save(file)
-    #
-    #     schema_f = Path(temp_folder) / str(schema_file.filename)
-    #     schema_file.save(schema_f)
-    #
-    #     run_file_validator(dataset_uri=str(file),
-    #                        data_file=str(file),
-    #                        schemas=[str(schema_f)],
-    #                        output=Path(temp_folder))
-    #
-    #     for pa in Path(temp_folder).iterdir():
-    #         print(pa)
+    try:
+        with tempfile.TemporaryDirectory() as temp_folder:
+            local_data_file = Path(temp_folder) / str(data_file.filename)
+            data_file.save(local_data_file)
 
-    # validate values
-    # see how to work around the one file bug
-    # use RDFUnit wrapper
-    return {"uri": dataset_uri,
-            "data_file": str(data_file.filename),
-            "file": str(schema_file.filename)}
+            local_schema_file = Path(temp_folder) / str(schema_file.filename)
+            schema_file.save(local_schema_file)
 
-    return "Success", 200
+            # run_file_validator(dataset_uri=str(local_data_file),
+            #                    data_file=str(local_data_file),
+            #                    schemas=[str(local_schema_file)],
+            #                    output=Path(temp_folder))
+
+            return send_from_directory(Path(temp_folder), local_data_file.name, as_attachment=True)  # 200
+    except Exception as e:
+        raise InternalServerError(str(e))
 
 
-def validate_sparql_endpoint(body, schema_file: FileStorage):
+def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
     """
   
     :param body: a dictionary with the json fields:
         :dataset_uri - The dataset URI
-        :endpoint_url - The endpoint to validate
+        :sparql_endpoint_url - The endpoint to validate
         :graphs - An optional list of named graphs to restrict the scope of the validation
     :param schema_file: The content of the SHACL shape files defining the validation constraints
-    :return:
+    :return: the validation ttl file
+    :rtype: ttl file, int
     """
     dataset_uri = body.get('dataset_uri')
-    endpoint_url = body.get('sparql_endpoint_url')
+    sparql_endpoint_url = body.get('sparql_endpoint_url')
     graphs = body.get('graphs')
 
-    # validate values
-    # see how to work around the one file bug
-    # use RDFUnit wrapper
-    return {"uri": dataset_uri,
-            "url": endpoint_url,
-            "graphs": graphs,
-            "file": str(schema_file.filename)}
+    if not _guess_file_type(schema_file.filename):
+        exception_text = 'File type errors: ' + schema_file.filename + '. Acceptable types: ' + \
+                         ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
+        raise UnsupportedMediaType(exception_text)
 
-    return "Success", 200
+    try:
+        with tempfile.TemporaryDirectory() as temp_folder:
+            local_schema_file = Path(temp_folder) / str(schema_file.filename)
+            schema_file.save(local_schema_file)
+
+            # run_sparql_endpoint_validator(dataset_uri=dataset_uri,
+            #                               sparql_endpoint_uri=sparql_endpoint_url,
+            #                               graphs_uris=graphs,
+            #                               schemas=[str(local_schema_file)],
+            #                               output=Path(temp_folder))
+
+            return send_from_directory(Path(temp_folder), local_schema_file.name, as_attachment=True)  # 200
+    except Exception as e:
+        raise InternalServerError(str(e))

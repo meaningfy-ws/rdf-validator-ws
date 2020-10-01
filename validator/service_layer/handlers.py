@@ -72,8 +72,7 @@ def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: Li
 
     cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
                                                       " -d ", dataset_uri,
-                                                      "" if (len(graphs_uris) == 0) else " -g ",
-                                                      "" if (len(graphs_uris) == 0) else ", ".join(
+                                                      "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
                                                           [graph for graph in graphs_uris]),
                                                       " -s " + ", ".join(
                                                           [schema for schema in schemas]),
@@ -103,8 +102,7 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
                                                       " -d ", dataset_uri,
                                                       " -e ", sparql_endpoint_uri,
-                                                      "" if (len(graphs_uris) == 0) else " -g ",
-                                                      "" if (len(graphs_uris) == 0) else ", ".join(
+                                                      "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
                                                           [graph for graph in graphs_uris]),
                                                       " -s ", ", ".join([schema for schema in schemas]),
                                                       " -f ", str(output))
