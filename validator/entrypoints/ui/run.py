@@ -6,7 +6,12 @@
 # Email: coslet.mihai@gmail.com
 
 """
-Module description
-
+Production UI server through flask definitions.
 """
+from validator.entrypoints.manage import ProductionConfig
 from . import app
+
+app.config.from_object(ProductionConfig())
+
+if __name__ == '__main__':
+    app.run()

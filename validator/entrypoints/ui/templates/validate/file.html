@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% set active_page = "validate_file" %}
+
+{% block app_content %}
+    <h1>{{ title }}</h1>
+    <form method="post" role="form">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+
+        {{ wtf.form_field(form.dataset_uri) }}
+        {{ wtf.form_field(form.data_file) }}
+        {{ wtf.form_field(form.schema_file) }}
+        {{ wtf.form_field(form.submit) }}
+    </form>
+{% endblock %}
