@@ -1,0 +1,47 @@
+# baseURI: http://publications.europa.eu/ontology/euvoc/temporalDescriptions
+# prefix: temporalDescriptions
+
+@prefix : <http://publications.europa.eu/ontology/euvoc/temporalDescriptions#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix euvoc: <http://publications.europa.eu/ontology/euvoc#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix tf: <http://publications.europa.eu/resource/authority/frequency/> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix tp: <http://publications.europa.eu/resource/authority/timeperiod/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+euvoc:startDate
+  a owl:DatatypeProperty ;
+  rdfs:comment "Date starting a period of time."@en ;
+.
+
+euvoc:endDate
+  a owl:DatatypeProperty ;
+  rdfs:comment "Date ending a period of time."@en ;
+.
+
+euvoc:duratonUnit
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "time span during which occurences occur"^^xsd:string ;
+  rdfs:domain dct:Frequency ;
+  rdfs:label "duraton unit"^^xsd:string ;
+  rdfs:range time:DurationDescription ;
+ 
+.
+
+euvoc:occurence
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "occurence"^^xsd:string ;
+  rdfs:domain dct:Frequency ;
+  rdfs:label "occurence"^^xsd:string ;
+  rdfs:range xsd:decimal ;
+   
+.
+<http://publications.europa.eu/ontology/euvoc/temporalDescriptions>
+  rdf:type owl:Ontology ;
+  rdfs:comment "The EuVoc module importing and defining the temporal relations and classes used in MDR authority tables"^^xsd:string ;
+  rdfs:label "Temporal Descriptions"^^xsd:string ;
+   
+.

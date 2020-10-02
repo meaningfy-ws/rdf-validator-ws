@@ -1,0 +1,74 @@
+# baseURI: http://publications.europa.eu/ontology/vbap-euvoc-notes
+# imports: http://datashapes.org/dash
+# imports: http://publications.europa.eu/ontology/euvoc
+# imports: http://publications.europa.eu/ontology/vbap
+
+@prefix : <http://publications.europa.eu/ontology/vbap-euvoc-notes#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix euvoc: <http://publications.europa.eu/ontology/euvoc#> .
+@prefix lemon: <http://lemon-model.net/lemon#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skos-xl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix vbap: <http://publications.europa.eu/ontology/vbap#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+euvoc:XlNotation
+  rdf:type sh:NodeShape ;
+  rdfs:comment "Reified XlNote" ;
+  rdfs:subClassOf vbap:DatedThing ;
+  rdfs:subClassOf vbap:StatusedThing ;
+  owl:versionInfo "1" ;
+  sh:property euvoc:XlNotation-type ;
+  sh:property euvoc:XlNotation-value ;
+.
+euvoc:XlNotation-type
+  rdf:type sh:PropertyShape ;
+  sh:path dct:type ;
+  sh:maxCount 1 ;
+  sh:name "type" ;
+  sh:nodeKind sh:IRI ;
+.
+euvoc:XlNotation-value
+  rdf:type sh:PropertyShape ;
+  sh:path rdf:value ;
+  sh:maxCount 1 ;
+  sh:minCount 1 ;
+  sh:nodeKind sh:Literal ;
+.
+euvoc:XlNote
+  rdf:type sh:NodeShape ;
+  rdfs:comment "Reified XlNote" ;
+  rdfs:label "Reified XlNote" ;
+  rdfs:subClassOf vbap:DatedThing ;
+  rdfs:subClassOf vbap:StatusedThing ;
+  owl:versionInfo "1" ;
+  sh:property euvoc:XlNote-source ;
+  sh:property euvoc:XlNote-value ;
+.
+euvoc:XlNote-source
+  rdf:type sh:PropertyShape ;
+  sh:path dct:source ;
+  sh:maxCount 1 ;
+  sh:name "source" ;
+  sh:nodeKind sh:IRIOrLiteral ;
+.
+euvoc:XlNote-value
+  rdf:type sh:PropertyShape ;
+  sh:path rdf:value ;
+  sh:maxCount 1 ;
+  sh:minCount 1 ;
+  sh:nodeKind sh:Literal ;
+.
+<http://publications.europa.eu/ontology/vbap-euvoc-notes>
+  rdf:type owl:Ontology ;
+  rdfs:label "SKOS source in VocBench3 Application Profile for EuVoc Notes and Notations" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:imports <http://publications.europa.eu/ontology/euvoc> ;
+  owl:imports <http://publications.europa.eu/ontology/vbap> ;
+.
