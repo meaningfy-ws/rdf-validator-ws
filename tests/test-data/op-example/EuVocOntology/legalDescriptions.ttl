@@ -1,0 +1,73 @@
+# baseURI: http://publications.europa.eu/ontology/euvoc/legalDescriptions
+# prefix: legalDescriptions
+
+@prefix : <http://publications.europa.eu/ontology/euvoc/legalDescriptions#> .
+@prefix euvoc: <http://publications.europa.eu/ontology/euvoc#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix eli: <http://data.europa.eu/eli/ontology#> .
+
+<http://data.europa.eu/eli/ontology#based_on>
+  rdfs:subPropertyOf euvoc:legallyBasedOn ;
+.
+<http://data.europa.eu/eli/ontology#basis_for>
+  rdfs:subPropertyOf euvoc:legalBasisFor ;
+.
+euvoc:legalBasisFor
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Indicates that this legal resource or expression empowers another resource."@en ;
+  rdfs:label "legal basis for" ;
+  owl:inverseOf euvoc:legallyBasedOn ;
+   
+.
+euvoc:legallyBasedOn
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Indicates that this resource is empowered by a legal resource, typically a constitution, a treaty or an enabling act. Inverse of \"legalBasisFor\"."@en ;
+  rdfs:label "legally based on" ;
+  owl:inverseOf euvoc:legalBasisFor ;
+   
+.
+euvoc:legallyBasedOnTreaty
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Indicates that this resource is empowered by a a treaty."@en ;
+  rdfs:label "legally based on treaty" ;
+  rdfs:subPropertyOf euvoc:legallyBasedOn ;
+   
+.
+<http://publications.europa.eu/ontology/euvoc/legalDescriptions>
+  rdf:type owl:Ontology ;
+  owl:imports <http://publications.europa.eu/ontology/euvoc/externalImports> ;
+  owl:versionInfo "This Module manages legal resources" ;
+.
+
+euvoc:adoptedEuroCurrencyOn
+  a owl:DatatypeProperty ;
+  rdfs:comment "adopted euro currency on" ;
+  rdfs:label "adopted euro currency on" ;
+  rdfs:range xsd:date ;
+   
+.
+
+euvoc:officialJournalDate
+  a owl:DatatypeProperty ;
+  rdfs:comment "official journal date; originally used in treaties table" ;
+  rdfs:label "official journal date" ;
+  rdfs:range xsd:date ;
+   
+.
+euvoc:officialJournalNumber
+  a owl:DatatypeProperty ;
+  rdfs:comment "official journal number; originally used in treaty table" ;
+  rdfs:label "official journal number" ;
+  rdfs:range xsd:string ;
+   
+.
+euvoc:officialJournalSeries
+  a owl:DatatypeProperty ;
+  rdfs:comment "official journal series; originally used in treaties table" ;
+  rdfs:label "official journal series" ;
+  rdfs:range xsd:string ;
+   
+.

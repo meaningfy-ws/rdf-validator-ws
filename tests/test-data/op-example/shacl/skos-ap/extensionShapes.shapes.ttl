@@ -1,0 +1,525 @@
+# baseURI: http://publications.europa.eu/ontology/euvoc/extensionShapes
+# imports: http://datashapes.org/dash
+# imports: http://publications.europa.eu/ontology/euvoc/euvocShapes
+
+
+@prefix : <http://publications.europa.eu/ontology/euvoc/extensionShapes#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix euvoc: <http://publications.europa.eu/ontology/euvoc#> .
+@prefix euvocShapes: <http://publications.europa.eu/ontology/euvoc/euvocShapes#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix v: <http://www.w3.org/2006/vcard/ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix lexinfo: <http://www.lexinfo.net/ontology/2.0/lexinfo#> .
+@prefix adms: <http://www.w3.org/ns/adms#> .
+
+<http://publications.europa.eu/ontology/euvoc/extensionShapes>
+  rdf:type owl:Ontology ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:imports <http://publications.europa.eu/ontology/euvoc/euvocShapes> ;
+  owl:versionInfo "1.2.0" ;
+.
+
+void:DatasetDescription
+  rdf:type sh:NodeShape ;
+  sh:property [
+      sh:path foaf:primaryTopic ;
+      sh:class dcat:Dataset ;
+      sh:name "primary topic" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+.
+
+skos:Collection
+  rdf:type sh:NodeShape ;
+  rdfs:label "Shape of the skos Concept in SKOS-AP-EU"@en ;
+  sh:property [
+      sh:path skos:inScheme ;
+      sh:class skos:ConceptScheme ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "in scheme" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skos:member ;
+      sh:class rdfs:Class ;
+      sh:minCount 1 ;
+      sh:name "member" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skos:prefLabel ;
+      sh:datatype rdf:langString ;
+      sh:minCount 1 ;
+      sh:name "pref label" ;
+    ] ;
+.
+skos:Concept
+  rdf:type sh:NodeShape ;
+  rdfs:subClassOf euvoc:DatedThing ;
+  sh:sparql [
+      sh:message "A thing cannot replace itself." ;
+      sh:select """
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix skosxl: <http://www.w3.org/2008/05/skos-xl#>
+prefix euvoc: <http://publications.europa.eu/ontology/euvoc#>
+prefix dct: <http://purl.org/dc/terms/>
+
+      SELECT $this
+WHERE {
+    $this dct:replaces ?other .
+    FILTER ($this = ?other)
+}""" ;
+    ] ;
+  sh:property [
+      sh:path <http://lemon-model.net/lemon#context> ;
+      sh:name "context" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path euvoc:xlDefinition ;
+      sh:class euvoc:XlNote ;
+      sh:minCount 0 ;
+      sh:name "xl definition" ;
+    ] ;
+  sh:property [
+      sh:path euvoc:xlNotation ;
+      sh:class euvoc:XlNotation ;
+      sh:name "xl notation" ;
+    ] ;
+  sh:property [
+      sh:path dct:created ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "created" ;
+    ] ;
+  sh:property [
+      sh:path dct:isReplacedBy ;
+      sh:class skos:Concept ;
+      sh:name "replaced by" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path dct:replaces ;
+      sh:class skos:Concept ;
+      sh:name "replaces" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path owl:versionInfo ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "version info" ;
+    ] ;
+  sh:property [
+      sh:path skos:broader ;
+      sh:class skos:Concept ;
+      sh:name "broader" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skos:definition ;
+      sh:datatype rdf:langString ;
+      sh:name "definition" ;
+    ] ;
+  sh:property [
+      sh:path skos:inScheme ;
+      sh:class skos:ConceptScheme ;
+      sh:minCount 1 ;
+      sh:name "in scheme" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skos:narrower ;
+      sh:class skos:Concept ;
+      sh:name "narrower" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skos:prefLabel ;
+      sh:datatype rdf:langString ;
+      sh:minCount 1 ;
+      sh:name "pref label" ;
+    ] ;
+  sh:property [
+      sh:path skos:relatedMatch ;
+      sh:class skos:Concept ;
+      sh:name "related match" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skos:topConceptOf ;
+      sh:class skos:ConceptScheme ;
+      sh:name "top concept of" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skosxl:prefLabel ;
+      sh:class skosxl:Label ;
+      sh:minCount 1 ;
+      sh:name "pref label" ;
+    ] ;
+  sh:scopeClass skos:Concept ;
+.
+skos:ConceptScheme
+  rdf:type sh:NodeShape ;
+  rdfs:label "Shape of the skos ConceptScheme in SKOS-AP-EU" ;
+  rdfs:subClassOf euvoc:DatedThing ;
+  sh:property [
+      sh:path dct:hasPart ;
+      sh:class skos:ConceptScheme ;
+      sh:name "has part" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path dct:identifier ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "identifier" ;
+    ] ;
+  sh:property [
+      sh:path owl:versionInfo ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "version info" ;
+    ] ;
+  sh:property [
+      sh:path skos:hasTopConcept ;
+      sh:class skos:Concept ;
+      sh:name "has top concept" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path skos:prefLabel ;
+      sh:datatype rdf:langString ;
+      sh:minCount 1 ;
+      sh:name "pref label" ;
+    ] ;
+  sh:property [
+      sh:path skosxl:prefLabel ;
+      sh:class skosxl:Label ;
+      sh:minCount 1 ;
+      sh:name "pref label" ;
+    ] ;
+.
+
+v:Address
+  rdf:type sh:NodeShape ;
+  sh:property [
+      sh:path v:country-name ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:name "identifier" ;
+    ] ;
+  sh:property [
+      sh:path v:locality ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:name "locality" ;
+    ] ;
+  sh:property [
+      sh:path v:post-office-box ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:name "post-office-box" ;
+    ] ;
+  sh:property [
+      sh:path v:postal-code ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:name "postal-code" ;
+    ] ;
+  sh:property [
+      sh:path v:region ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:name "region" ;
+    ] ;
+  sh:property [
+      sh:path v:street-address ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:name "street-address" ;
+    ] ;
+.
+skosxl:Label
+  rdf:type sh:NodeShape ;
+  rdfs:subClassOf euvoc:DatedThing ;
+  sh:property [
+      sh:path lexinfo:gender ;
+      sh:class lexinfo:Gender ;
+      sh:maxCount 1 ;
+      sh:name "gender" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path lexinfo:number ;
+      sh:class lexinfo:Number ;
+      sh:maxCount 1 ;
+      sh:name "number" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path owl:versionInfo ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:minCount 0 ;
+      sh:name "version info" ;
+    ] ;
+  sh:property [
+      sh:path skosxl:literalForm ;
+      sh:datatype rdf:langString ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "literal form" ;
+    ] ;
+.
+dcat:Dataset
+  rdf:type sh:NodeShape ;
+  sh:property [
+      sh:path dct:accrualPeriodicity ;
+      sh:class dct:Frequency ;
+      sh:name "accrual periodicity" ;
+    ] ;
+  sh:property [
+      sh:path dct:conformsTo ;
+      sh:class dct:Standard ;
+      sh:name "comforms to" ;
+    ] ;
+  sh:property [
+      sh:path dct:contributor ;
+      sh:class dct:Agent ;
+      sh:name "contributor" ;
+    ] ;
+  sh:property [
+      sh:path dct:hasPart ;
+      sh:class dcat:Dataset ;
+      sh:name "has part" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path dct:identifier ;
+      sh:datatype xsd:string ;
+      sh:name "identifier" ;
+    ] ;
+  sh:property [
+      sh:path dct:issued ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:name "issued" ;
+    ] ;
+  sh:property [
+      sh:path dct:spatial ;
+      sh:class dct:Location ;
+      sh:maxCount 1 ;
+      sh:name "spatial" ;
+    ] ;
+  sh:property [
+      sh:path dct:spatial ;
+      sh:class dct:Location ;
+      sh:maxCount 1 ;
+      sh:name "spatial" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path dct:temporal ;
+      sh:class dct:PeriodOfTime ;
+      sh:name "temporal" ;
+    ] ;
+  sh:property [
+      sh:path adms:identifier ;
+      sh:datatype xsd:string ;
+      sh:name "identifier" ;
+    ] ;
+  sh:property [
+      sh:path adms:versionNotes ;
+      sh:datatype rdf:langString ;
+      sh:name "version notes" ;
+    ] ;
+  sh:property [
+      sh:path dcat:distribution ;
+      sh:class dcat:Distribution ;
+      sh:name "distribution" ;
+    ] ;
+  sh:property [
+      sh:path dcat:keyword ;
+      sh:datatype xsd:string ;
+      sh:name "keyword" ;
+    ] ;
+  sh:property [
+      sh:path dcat:landingPage ;
+      sh:class foaf:Document ;
+      sh:maxCount 1 ;
+      sh:name "landing page" ;
+    ] ;
+  sh:property [
+      sh:path foaf:page ;
+      sh:class void:DatasetDescription ;
+      sh:name "page" ;
+    ] ;
+.
+org:Membership
+  rdf:type sh:NodeShape ;
+  rdfs:label "Shape in SKOS-AP-EU" ;
+  sh:property [
+      sh:path euvoc:endDate ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:name "end date" ;
+    ] ;
+  sh:property [
+      sh:path euvoc:startDate ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:name "start date" ;
+    ] ;
+  sh:property [
+      sh:path euvoc:startDate ;
+      sh:lessThanOrEquals euvoc:endDate ;
+    ] ;
+  sh:property [
+      sh:path dct:created ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:name "created" ;
+    ] ;
+  sh:property [
+      sh:path dct:dateAccepted ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:name "date accepted" ;
+    ] ;
+  sh:property [
+      sh:path dct:dateAccepted ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:name "start date" ;
+    ] ;
+  sh:property [
+      sh:path dct:dateSubmitted ;
+      sh:datatype xsd:date ;
+      sh:maxCount 1 ;
+      sh:name "date submitted" ;
+    ] ;
+  sh:property [
+      sh:path dct:dateSubmitted ;
+      sh:lessThanOrEquals dct:dateAccepted ;
+    ] ;
+  sh:property [
+      sh:path org:member ;
+      sh:class foaf:Agent ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "member" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path org:organization ;
+      sh:class org:Organization ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "organization" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path org:role ;
+      sh:class org:Role ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "role" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+.
+org:Organization
+  rdf:type sh:NodeShape ;
+  rdfs:subClassOf euvoc:DatedThing ;
+  sh:property [
+      sh:path dcat:contactPoint ;
+      sh:class v:Address ;
+      sh:name "contact point" ;
+    ] ;
+  sh:property [
+      sh:path org:classification ;
+      sh:class skos:Concept ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "classification" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path org:hasSite ;
+      sh:class org:Site ;
+      sh:name "has site" ;
+    ] ;
+  sh:property [
+      sh:path org:hasSubOrganization ;
+      sh:class org:Organization ;
+      sh:name "has sub organization" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path org:identifier ;
+      sh:datatype xsd:string ;
+      sh:maxCount 1 ;
+      sh:name "identifier" ;
+    ] ;
+  sh:property [
+      sh:path org:subOrganizationOf ;
+      sh:class org:Organization ;
+      sh:name "sub organization of" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      sh:path foaf:depiction ;
+      sh:class foaf:Image ;
+      sh:name "depiction" ;
+    ] ;
+.
+org:Role
+  rdf:type sh:NodeShape ;
+.
+org:Site
+  rdf:type sh:NodeShape ;
+  rdfs:subClassOf euvoc:DatedThing ;
+  sh:property [
+      sh:path dct:relation ;
+      sh:description "strange connection to the URL of the site shape on the OpenStreetMaps" ;
+      sh:name "relation" ;
+    ] ;
+  sh:property [
+      sh:path v:email ;
+      sh:datatype xsd:string ;
+      sh:name "email" ;
+    ] ;
+  sh:property [
+      sh:path v:hasAddress ;
+      sh:class v:Address ;
+      sh:name "has address" ;
+    ] ;
+  sh:property [
+      sh:path v:hasEmail ;
+      sh:datatype xsd:string ;
+      sh:name "has email" ;
+    ] ;
+  sh:property [
+      sh:path org:siteAddress ;
+      sh:class v:Address ;
+      sh:name "site address" ;
+    ] ;
+.
+

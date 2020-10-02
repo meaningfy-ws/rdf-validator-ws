@@ -1,0 +1,28 @@
+# baseURI: http://publications.europa.eu/ontology/euvoc/evapSkos
+# imports: http://publications.europa.eu/ontology/euvoc/euvocShapes
+# imports: http://publications.europa.eu/ontology/skosShapes
+
+@prefix : <http://publications.europa.eu/ontology/euvoc/evapSkos#> .
+@prefix atOldLabelType: <http://publications.europa.eu/resource/authority/labelType/> .
+@prefix atOldStatus: <http://publications.europa.eu/resource/authority/status/> .
+@prefix conceptStatus: <http://publications.europa.eu/resource/authority/concept-status#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix euvoc: <http://publications.europa.eu/ontology/euvoc#> .
+@prefix euvocShapes: <http://publications.europa.eu/ontology/euvoc/euvocShapes#> .
+@prefix labelType: <http://publications.europa.eu/resource/authority/label-type#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skosShapes: <http://publications.europa.eu/ontology/skosShapes#> .
+@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://publications.europa.eu/ontology/euvoc/evapSkos>
+  rdf:type owl:Ontology ;
+  owl:imports <http://publications.europa.eu/ontology/euvoc/euvocShapes> ;
+  owl:imports <http://publications.europa.eu/ontology/skosShapes> ;
+.
