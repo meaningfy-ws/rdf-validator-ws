@@ -9,9 +9,14 @@
 UI pages
 
 """
-from flask import render_template
+import tempfile
+from json import loads
+from pathlib import Path
+
+from flask import render_template, flash, send_from_directory
 
 from validator.entrypoints.ui import app
+from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_file
 from validator.entrypoints.ui.forms import ValidateFromFileForm, ValidateSPARQLEndpointForm
 
 
@@ -23,8 +28,22 @@ def index():
 @app.route('/validate-file', methods=['GET', 'POST'])
 def validate_file():
     form = ValidateFromFileForm()
+
     if form.validate_on_submit():
-        print(form)
+        response, status = api_validate_file(
+            dataset_uri=form.dataset_uri.data,
+            data_file=form.data_file.data,
+            schema_file=form.schema_file.data
+        )
+
+        if status != 200:
+            flash(loads(response).get('detail'), 'error')
+        else:
+            with tempfile.TemporaryDirectory() as temp_folder:
+                report = Path(temp_folder) / str('report.ttl')
+                report.write_bytes(response)
+                return send_from_directory(Path(temp_folder), 'report.ttl', as_attachment=True)
+
     return render_template('validate/file.html', form=form, title='Validate File')
 
 

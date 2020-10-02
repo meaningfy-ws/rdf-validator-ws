@@ -17,21 +17,17 @@ from wtforms.validators import DataRequired, URL
 
 
 class BaseValidateForm(FlaskForm):
-    dataset_uri = StringField('Dataset URI', validators=[URL()])
-    schema_file = FileField('Schema file',
-                            validators=[FileRequired(),
-                                        FileAllowed(['ttl'], 'This rdf format is not supported')])
+    dataset_uri = StringField('Dataset URI*', validators=[DataRequired(), URL()])
+    schema_file = FileField('Schema file*',
+                            validators=[FileRequired()])
     submit = SubmitField('Validate')
 
 
 class ValidateFromFileForm(BaseValidateForm):
-    data_file = FileField('Data file',
-                          validators=[FileRequired(),
-                                      FileAllowed(['ttl'], 'This rdf format is not supported')])
-    submit = SubmitField('Validate')
+    data_file = FileField('Data file*',
+                          validators=[FileRequired()])
 
 
 class ValidateSPARQLEndpointForm(BaseValidateForm):
-    endpoint_url = StringField('Endpoint URL', validators=[DataRequired(), URL()])
+    endpoint_url = StringField('Endpoint URL*', validators=[DataRequired(), URL()])
     graphs = TextAreaField('Graphs', description='Separate them through spaces. example: graph1 graph2')
-    submit = SubmitField('Validate')

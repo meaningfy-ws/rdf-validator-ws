@@ -2,7 +2,10 @@
 {% set active_page = "index" %}
 
 {% block app_content %}
-    <h1>Meaningfy RDF Validator</h1>
-    <a class="btn btn-primary" href="{{ url_for('validate_file') }}">Validate File</a>
-    <a class="btn btn-primary" href="{{ url_for('validate_sparql_endpoint') }}">Validate SPARQL Endpoint</a>
+    <h1 id="title">Meaningfy RDF Validator</h1>
+    <div id="validators">
+        {% for href, _, caption in navigation_bar %}
+            <a class="btn btn-info" href="{{ href }}">{{ caption }} Validation</a>
+        {% endfor %}
+    </div>
 {% endblock %}
