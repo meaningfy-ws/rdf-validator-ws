@@ -14,9 +14,9 @@ install-prod:
 	@ pip install -r requirements.txt
 
 install-dev:
-	@ echo "$(BUILD_PRINT)Installing the development requirements"
+	@ echo "$(BUILD_PRINT)Installing the local requirements"
 	@ pip install --upgrade pip
-	@ pip install -r requirements/dev.txt
+	@ pip install -r requirements/local.txt
 
 test:
 	@ echo "$(BUILD_PRINT)Running the tests"
@@ -30,7 +30,7 @@ build-dev-api:
 	@ echo -e '$(BUILD_PRINT)Building the api container'
 	@ docker-compose --file local.yml --env-file compose/local/api/.dev build validator-api
 
-run-dev-api:
+start-dev-api:
 	@ echo -e '$(BUILD_PRINT)Starting the api container'
 	@ docker-compose --file local.yml --env-file compose/local/api/.dev up -d validator-api
 
@@ -46,7 +46,7 @@ build-dev-ui:
 	@ echo -e '$(BUILD_PRINT)Building the ui container'
 	@ docker-compose --file local.yml --env-file compose/local/ui/.dev build validator-ui
 
-run-dev-ui:
+start-dev-ui:
 	@ echo -e '$(BUILD_PRINT)Starting the ui container'
 	@ docker-compose --file local.yml --env-file compose/local/ui/.dev up -d validator-ui
 
@@ -62,7 +62,7 @@ build-dev:
 	@ echo -e '$(BUILD_PRINT)Building the dev container'
 	@ docker-compose --file local.yml --env-file compose/local/api/.dev build
 
-run-dev:
+start-dev:
 	@ echo -e '$(BUILD_PRINT)Starting the dev services'
 	@ docker-compose --file local.yml --env-file compose/local/api/.dev up -d
 
