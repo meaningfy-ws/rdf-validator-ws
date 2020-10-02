@@ -10,7 +10,7 @@ Development UI server through flask definitions.
 
 """
 from validator.entrypoints.ui import app
-from validator.entrypoints.manage import DevelopmentConfig
+from validator.entrypoints.flask_config import DevelopmentConfig
 
 app.config.from_object(DevelopmentConfig())
 

@@ -12,7 +12,7 @@ import pytest
 
 from validator.entrypoints.api import app as api_app
 from validator.entrypoints.ui import app as ui_app
-from validator.entrypoints.manage import TestingConfig
+from validator.entrypoints.flask_config import TestingConfig
 
 
 @pytest.fixture

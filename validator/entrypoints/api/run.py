@@ -10,7 +10,7 @@ Production API server through connexion definitions.
 """
 
 from validator.entrypoints.api import app
-from validator.entrypoints.manage import ProductionConfig
+from validator.entrypoints.flask_config import ProductionConfig
 
 app.config.from_object(ProductionConfig())
 

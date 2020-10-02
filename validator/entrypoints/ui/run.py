@@ -8,7 +8,7 @@
 """
 Production UI server through flask definitions.
 """
-from validator.entrypoints.manage import ProductionConfig
+from validator.entrypoints.flask_config import ProductionConfig
 from . import app
 
 app.config.from_object(ProductionConfig())

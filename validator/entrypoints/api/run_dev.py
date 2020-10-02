@@ -10,7 +10,7 @@ Development API server through connexion definitions.
 """
 
 from validator.entrypoints.api import app
-from validator.entrypoints.manage import DevelopmentConfig
+from validator.entrypoints.flask_config import DevelopmentConfig
 
 app.config.from_object(DevelopmentConfig())
 
