@@ -6,3 +6,7 @@ coverage
 pytest-cov
 pytest-bdd
 beautifulsoup4
+
+Flask
+flask-bootstrap
+Flask-Wtf
