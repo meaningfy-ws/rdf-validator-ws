@@ -78,7 +78,7 @@ make test
 
 ## Usage
 ### `validator-api` examples
-> Validate File: [http://0.0.0.0:3040/validate-file]([http://0.0.0.0:3040/validate-file])
+> Validate File: [http://0.0.0.0:3040/validate-file](http://0.0.0.0:3040/validate-file)
 
 ![validate file api example](resources/examples/validate-file.png)
 
