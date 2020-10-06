@@ -1,0 +1,215 @@
+# baseURI: http://publications.europa.eu/ontology/euvoc/organisationDescriptions
+
+@prefix : <http://publications.europa.eu/ontology/euvoc/organisationDescriptions#> .
+@prefix adms: <http://www.w3.org/ns/adms#> .
+@prefix cc: <http://creativecommons.org/ns#> .
+@prefix cdm: <http://publications.europa.eu/ontology/cdm#> .
+@prefix cmr: <http://publications.europa.eu/ontology/cdm/cmr#> .
+@prefix dataTypeDefinitions: <http://publications.europa.eu/ontology/euvoc/dataTypeDefinitions#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcam: <http://purl.org/dc/dcam/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix eli: <http://data.europa.eu/eli/ontology#> .
+@prefix euvoc: <http://publications.europa.eu/ontology/euvoc#> .
+@prefix event: <http://purl.org/NET/c4dm/event.owl#> .
+@prefix extensionDesctiptions: <http://publications.europa.eu/ontology/euvoc/extensionDesctiptions#> .
+@prefix externalImports: <http://publications.europa.eu/ontology/euvoc/externalImports#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+@prefix geosparqlsf: <http://www.opengis.net/ont/sf#> .
+@prefix geowgs84: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix gml: <http://www.opengis.net/ont/gml#> .
+@prefix legalDescriptions: <http://publications.europa.eu/ontology/euvoc/legalDescriptions> .
+@prefix lemon: <http://lemon-model.net/lemon#> .
+@prefix lexinfo: <http://www.lexinfo.net/ontology/2.0/lexinfo#> .
+@prefix linguisticDescriptions: <http://publications.europa.eu/ontology/euvoc/linguisticDescriptions#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix lvont: <http://lexvo.org/ontology#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix person: <http://www.w3.org/ns/person#> .
+@prefix pim: <http://www.w3.org/2000/10/swap/pim/contact#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdaelements: <http://rdaregistry.info/Elements/c/> .
+@prefix rdakit: <http://metadataregistry.org/uri/profile/rdakit/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix spatialDescriptions: <http://publications.europa.eu/ontology/euvoc/spatialDescriptions#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix tableDescriptions: <http://publications.europa.eu/ontology/euvoc/tableDescriptions#> .
+@prefix temporalDescriptions: <http://publications.europa.eu/ontology/euvoc/temporalDescriptions#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix voaf: <http://purl.org/vocommons/voaf#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://publications.europa.eu/ontology/euvoc/organisationDescriptions>
+  rdf:type owl:Ontology ;
+  rdfs:comment "The EuVoc module handles extensions of ORG classes and properties"^^xsd:string ;
+  rdfs:label "ORG Descriptions"^^xsd:string ;
+.
+
+
+
+euvoc:XlSemanticRelation
+  rdf:type owl:Class ;
+  rdfs:comment "Current value and historical values of org:hasSubOrganization"@en ;
+  rdfs:label "Semantic Relation (Deprecated)" ;  
+  owl:deprecated "true"^^xsd:boolean ;
+.
+euvoc:XlType
+  rdf:type owl:Class ;
+  rdfs:comment "Current value and historical values of org:classification."@en ;
+  owl:deprecated "true"^^xsd:boolean ;
+.
+
+euvoc:contactPoint
+  a owl:ObjectProperty ;
+  rdfs:comment "This relationship is mainly designed for WhoIsWho but is also used in MDR NALs." ;
+  rdfs:comment "a relationship ascribing a contact point, usually of the vacrd:Kind type, to an org entity of site, membership or organization types." ;
+  rdfs:label "contact point" ;
+.
+
+euvoc:getsReportingFrom
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "indicates from who the person gets reporting from."@en ;
+  rdfs:range org:Membership ;
+  owl:inverseOf euvoc:reportsTo ;
+.
+
+euvoc:managedBy
+  a owl:ObjectProperty ;
+  rdfs:comment "relates a site to the organization which manages it" ;
+  rdfs:domain org:Site ;
+  rdfs:label "managed by" ;
+  rdfs:range org:Organization ;
+  owl:versionInfo "EuVoc 1.1" ;
+.
+euvoc:officeAddress
+  a owl:DatatypeProperty ;
+  rdfs:comment "address of the office inside the building. Subproperty of vcard:street-address"@en ;
+  rdfs:subPropertyOf vcard:street-address ;
+.
+euvoc:officialBirthName
+  a owl:DatatypeProperty ;
+  rdfs:comment "Mainly to manage name of the person before marriage. In the original script."@en ;
+.
+euvoc:officialFamilyName
+  a owl:DatatypeProperty ;
+  rdfs:comment "The family name of some person.  In the original script."@en ;
+.
+euvoc:officialGivenName
+  a owl:DatatypeProperty ;
+  rdfs:comment "The given name of some person. In the original script."@en ;
+  rdfs:range rdfs:Literal ;
+.
+
+euvoc:orderMethod
+  a owl:DatatypeProperty ;
+  rdfs:comment "Method used to order the related memberships  and sub-organisations. In 99% of the case the method  is based on the order number, not on alphabetic.xs:simpleType name=\"orderMethod\">, <xs:restriction base=\"xs:string\">, <xs:enumeration value=\"default\"/>, <xs:enumeration value=\"list\"/>, <xs:enumeration value=\"protocolar\"/>, <xs:enumeration value=\"alphabetic\"/>, <xs:enumeration value=\"id\"/>"@en ;
+  rdfs:range rdfs:Literal ;
+.
+euvoc:positionComplement
+  a owl:DatatypeProperty ;
+  rdfs:comment "Allows to enrich the position with a free text such as \"to the director\", \"in charge of IT”.."@en ;
+  rdfs:range rdfs:Literal ;
+.
+euvoc:positionStatus
+  a owl:ObjectProperty ;
+  rdfs:comment "Allows to enrich the function with a controlled value."@en ;
+  rdfs:range euvoc:PositionStatus ;
+.
+euvoc:protocolLevel
+  a owl:DatatypeProperty ;
+  rdfs:comment "Current value of the protocol-level."@en ;
+  rdfs:range xsd:integer ;
+.
+euvoc:reportsTo
+  a owl:ObjectProperty ;
+  rdfs:comment "Indicates the reporting link for example between a director and his assistant.Current value."@en ;
+  rdfs:range org:Membership ;
+.
+euvoc:represents
+  a owl:ObjectProperty ;
+  rdfs:comment "A person in a membership can represent an agent. i.e. a civil servant represents the state in a board of administration, a deputy represents his country at the parliament."@en ;
+  rdfs:range foaf:Agent ;
+.
+euvoc:roleQualification
+  a owl:ObjectProperty ;
+  rdfs:comment "Indicates the type of position of the person. i.e. judge, deputy, director… Some business rules are related to this position, like the retention time of the personal information, the publication or not of some of the properties (you don't publish judge telephone number), the publication of the full given name or just the first letter…."@en ;
+  rdfs:range euvoc:RoleQualification ;
+.
+
+euvoc:xlClassification
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Relates a resource to the historical values of org:classification."@en ;
+  rdfs:domain org:Organization ;
+  rdfs:range euvoc:XlType ;
+.
+euvoc:xlGetsReportingFrom
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Current value and historical values of the reporting relationship."@en ;
+  rdfs:range euvoc:XlSemanticRelation ;
+  owl:inverseOf euvoc:xlReportsTo ;
+.
+euvoc:xlHasSubOrganization
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Relates an Organization to the current and historical values of org:hasSubOrganization."@en ;
+  rdfs:domain org:Organization ;
+  rdfs:range euvoc:XlSemanticRelation ;
+.
+
+euvoc:xlPositionComplement
+  a owl:ObjectProperty ;
+  rdfs:comment "actual and historical values of the position complemment."@en ;
+  rdfs:range euvoc:XlNote ;
+.
+euvoc:xlProtocolLevel
+  a owl:ObjectProperty ;
+  rdfs:comment "Current value and historical values of the protocol-level."@en ;
+  rdfs:domain org:Organization ;
+  rdfs:range euvoc:XlNumericalValue ;
+.
+euvoc:xlReportsTo
+  a owl:ObjectProperty ;
+  rdfs:comment "Current value and historical values of the reporting relationship."@en ;
+   
+.
+
+euvoc:xlSubOrganizationOf
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Relates an Organization to the current and historical values of org:subOrganizationOf"@en ;
+  rdfs:domain org:Organization ;
+  rdfs:range euvoc:XlSemanticRelation ;
+.
+
+euvoc:xlObject
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "When a semantic relationship is reified with euvoc:XlSemanticRelation (used for org:subOrganization or skos:broader for example), this property indicates the object of the relationship. The target of the relationship is indicated with the property euvo::xlTarget."@en ;
+  rdfs:domain euvoc:XlSemanticRelation ;
+  rdfs:range owl:Thing ;
+.
+
+euvoc:xlTarget
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "When a semantic relationship is reified with euvoc:XlSemanticRelation (used for org:subOrganization or skos:broader for example), this property indicates the target of the relationship. The object of the relationship is indicated with the property euvo:xlObject."@en ;
+  rdfs:domain euvoc:XlSemanticRelation ;
+  rdfs:range owl:Thing ;
+.
+euvoc:xlTypeValue
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Value of a Type when reified in the class euvo:XlType used to keep historical value of a type (used for org:classification historical values)."@en ;
+  rdfs:domain euvoc:XlType ;
+  rdfs:range skos:Concept ;
+.
+
+euvoc:xlOrder
+  a owl:ObjectProperty ;
+  rdfs:comment "Current value and historical values of the numerical value giving the order of a resource among its sibling organizations but also sibling memberships."@en ;
+.
