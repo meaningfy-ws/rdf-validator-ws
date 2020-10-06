@@ -1,8 +1,6 @@
-# Meaningfy's RDF validator
+#  RDF validator
 
-An RDF web based validator created by Meaningfy.
-It works by using the work of the guys from [TopQuadrant](https://github.com/TopQuadrant/shacl) with their SHACL validation 
-and [AKSW Research Group](https://github.com/AKSW/RDFUnit) at the University of Leipzig. 
+RDF validator is a web service for validating RDF data with SHACL shape definitions. It is based on the [RDFUnit](https://github.com/AKSW/RDFUnit) developed at the University of Leipzig. 
 
 ## Description
 
@@ -90,5 +88,4 @@ make test
 Written by: [Meaningfy](https://github.com/meaningfy-ws)
 
 Validator tools used:
-- [TopQuadrant](https://github.com/TopQuadrant/shacl) 
 - [AKSW Research Group](https://github.com/AKSW/RDFUnit) at the University of Leipzig. 
