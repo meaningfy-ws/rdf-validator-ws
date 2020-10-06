@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   itb:
-    build: ./itb
+    build: compose/production/itb
     container_name: generic-validator
     ports:
       - 9090:8080
@@ -14,4 +14,4 @@ services:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
-    env_file: .env.prod
+    env_file: compose/production/api/.prod

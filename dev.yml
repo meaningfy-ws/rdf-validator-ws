@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   itb:
-    build: ./itb
+    build: compose/production/itb
     container_name: generic-validator
     ports:
       - 9090:8080
@@ -11,18 +11,20 @@ services:
     container_name: validator-api
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: ./compose/local/api/Dockerfile
     volumes:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
-    env_file: .env.dev
+    env_file: ./compose/local/api/.dev
 
   validator-ui:
     container_name: validator-ui
-    build: ./ui
+    build:
+      context: .
+      dockerfile: ./compose/local/ui/Dockerfile
     volumes:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_UI_PORT}:${VALIDATOR_UI_PORT}
-    env_file: ui/.env.dev
+    env_file: ./compose/local/ui/.dev

@@ -1,4 +1,6 @@
-requests
+-r common.txt
+
+gunicorn
 
 Flask
 flask-bootstrap
