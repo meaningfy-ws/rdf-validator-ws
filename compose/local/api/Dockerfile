@@ -1,4 +1,19 @@
+# Build RDFUnit
+FROM maven:3-jdk-8 as build
+
+RUN curl https://codeload.github.com/AKSW/RDFUnit/zip/master --output rdfunit-sources.zip
+RUN unzip rdfunit-sources.zip
+WORKDIR /RDFUnit-master
+RUN mvn -pl rdfunit-validate -am clean package -P cli-standalone -DskipTests=true
+
+# Build for python API
 FROM python:3.8.5-buster
+
+RUN apt-get update -y \
+&& apt-get upgrade -y \
+&& apt-get install -y openjdk-11-jre
+WORKDIR /usr/src/app
+COPY --from=build /RDFUnit-master/rdfunit-validate/target/rdfunit-validate-*-standalone.jar /usr/src/app/rdfunit-validate.jar
 
 WORKDIR /usr/src/app
 

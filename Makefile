@@ -16,7 +16,7 @@ install-prod:
 install-dev:
 	@ echo "$(BUILD_PRINT)Installing the local requirements"
 	@ pip install --upgrade pip
-	@ pip install -r requirements/local.txt
+	@ pip install -r requirements/dev.txt
 
 test:
 	@ echo "$(BUILD_PRINT)Running the tests"
@@ -28,15 +28,15 @@ test:
 
 build-dev-api:
 	@ echo -e '$(BUILD_PRINT)Building the api container'
-	@ docker-compose --file local.yml --env-file compose/local/api/.dev build validator-api
+	@ docker-compose --file dev.yml --env-file compose/local/api/.dev build validator-api
 
 start-dev-api:
 	@ echo -e '$(BUILD_PRINT)Starting the api container'
-	@ docker-compose --file local.yml --env-file compose/local/api/.dev up -d validator-api
+	@ docker-compose --file dev.yml --env-file compose/local/api/.dev up -d validator-api
 
 stop-dev-api:
 	@ echo -e '$(BUILD_PRINT)Stopping the api container'
-	@ docker-compose --file local.yml --env-file compose/local/api/.dev stop validator-api
+	@ docker-compose --file dev.yml --env-file compose/local/api/.dev stop validator-api
 
 #-----------------------------------------------------------------------------
 # UI server related commands
@@ -44,15 +44,15 @@ stop-dev-api:
 
 build-dev-ui:
 	@ echo -e '$(BUILD_PRINT)Building the ui container'
-	@ docker-compose --file local.yml --env-file compose/local/ui/.dev build validator-ui
+	@ docker-compose --file dev.yml --env-file compose/local/ui/.dev build validator-ui
 
 start-dev-ui:
 	@ echo -e '$(BUILD_PRINT)Starting the ui container'
-	@ docker-compose --file local.yml --env-file compose/local/ui/.dev up -d validator-ui
+	@ docker-compose --file dev.yml --env-file compose/local/ui/.dev up -d validator-ui
 
 stop-dev-ui:
 	@ echo -e '$(BUILD_PRINT)Stopping the ui container'
-	@ docker-compose --file local.yml --env-file compose/local/ui/.dev stop validator-ui
+	@ docker-compose --file dev.yml --env-file compose/local/ui/.dev stop validator-ui
 
 #-----------------------------------------------------------------------------
 # (all) Development environment
@@ -60,12 +60,12 @@ stop-dev-ui:
 
 build-dev:
 	@ echo -e '$(BUILD_PRINT)Building the dev container'
-	@ docker-compose --file local.yml --env-file compose/local/api/.dev build
+	@ docker-compose --file dev.yml --env-file compose/local/api/.dev build
 
 start-dev:
 	@ echo -e '$(BUILD_PRINT)Starting the dev services'
-	@ docker-compose --file local.yml --env-file compose/local/api/.dev up -d
+	@ docker-compose --file dev.yml --env-file compose/local/api/.dev up -d
 
 stop-dev:
 	@ echo -e '$(BUILD_PRINT)Stopping the dev services'
-	@ docker-compose --file local.yml --env-file compose/local/api/.dev stop
+	@ docker-compose --file dev.yml --env-file compose/local/api/.dev stop
