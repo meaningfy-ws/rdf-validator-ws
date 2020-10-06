@@ -8,6 +8,6 @@ ENV PYTHONUNBUFFERED 1
 COPY . /usr/src/app
 
 RUN pip install --upgrade pip
-RUN pip install -r requirements/local.txt
+RUN pip install -r requirements/dev.txt
 
 CMD flask run --host=0.0.0.0 --port=${VALIDATOR_API_PORT}

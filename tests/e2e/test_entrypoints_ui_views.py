@@ -29,7 +29,7 @@ def test_index(ui_client):
     soup = _helper_get_request_and_parse(ui_client, ui_url)
 
     title = soup.find('h1')
-    assert 'Meaningfy RDF Validator' in title.get_text()
+    assert 'RDF Validator' in title.get_text()
 
     validators = soup.find(id='validators').find_all('a')
     assert len(validators) == 2
