@@ -11,10 +11,17 @@ Fixtures and config data for the testing module.
 import pytest
 
 from validator.entrypoints.api import app as api_app
-from validator.entrypoints.manage import TestingConfig
+from validator.entrypoints.ui import app as ui_app
+from validator.entrypoints.flask_config import TestingConfig
 
 
 @pytest.fixture
 def api_client():
     api_app.config.from_object(TestingConfig())
     return api_app.test_client()
+
+
+@pytest.fixture
+def ui_client():
+    ui_app.config.from_object(TestingConfig())
+    return ui_app.test_client()

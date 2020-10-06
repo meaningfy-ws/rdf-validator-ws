@@ -6,10 +6,10 @@
 # Email: coslet.mihai@gmail.com
 
 """
-Development API server through connexion definitions.
-"""
+Development UI server through flask definitions.
 
-from validator.entrypoints.api import app
+"""
+from validator.entrypoints.ui import app
 from validator.entrypoints.flask_config import DevelopmentConfig
 
 app.config.from_object(DevelopmentConfig())

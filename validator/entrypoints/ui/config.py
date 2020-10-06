@@ -6,8 +6,9 @@
 # Email: coslet.mihai@gmail.com
 
 """
-
+Configuration for the current Flask project.
 """
 import os
 
 FLASK_SECRET_KEY = os.environ.get('SECRET_KEY', 'secret key')
+VALIDATOR_API_ENDPOINT = os.environ.get('VALIDATOR_API_ENDPOINT', 'http://localhost:3040')

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% set active_page = "validate_file" %}
+
+{% block app_content %}
+    <h1 id="title">{{ title }}</h1>
+
+    <form method="post" role="form" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+
+        {{ wtf.form_field(form.dataset_uri) }}
+        {{ wtf.form_field(form.data_file) }}
+        {{ wtf.form_field(form.schema_file) }}
+        <div class="row">
+            <div class="col-md-6">
+                <button type="submit" id="submit" class="btn btn-primary">{{ title }}</button>
+            </div>
+            <div class="col-md-6">
+                <a href="{{ url_for('validate_file') }}" id="reload" class="btn btn-warning pull-right">Reset form</a>
+            </div>
+        </div>
+    </form>
+{% endblock %}

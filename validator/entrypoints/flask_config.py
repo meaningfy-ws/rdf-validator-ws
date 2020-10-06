@@ -37,3 +37,4 @@ class TestingConfig(FlaskConfig):
     Testing Flask config
     """
     TESTING = True
+    WTF_CSRF_ENABLED = False

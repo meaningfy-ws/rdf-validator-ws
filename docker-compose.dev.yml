@@ -24,5 +24,5 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - ${UI_PORT}:${UI_PORT}
+      - ${VALIDATOR_UI_PORT}:${VALIDATOR_UI_PORT}
     env_file: ui/.env.dev

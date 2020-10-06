@@ -11,7 +11,7 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
-from .config import FLASK_SECRET_KEY
+from validator.entrypoints.ui.config import FLASK_SECRET_KEY
 
 app = Flask(__name__)
 Bootstrap(app)
