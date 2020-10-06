@@ -17,3 +17,12 @@ services:
     ports:
       - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
     env_file: .env.dev
+
+  validator-ui:
+    container_name: validator-ui
+    build: ./ui
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - ${UI_PORT}:${UI_PORT}
+    env_file: ui/.env.dev

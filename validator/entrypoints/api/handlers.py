@@ -6,24 +6,89 @@
 # Email: coslet.mihai@gmail.com
 
 """
-OpenAPI mehod handlers.
+OpenAPI method handlers.
 """
+import tempfile
+from pathlib import Path
+
+from flask import send_from_directory
 from werkzeug.datastructures import FileStorage
+from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
+
+from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES
+from validator.service_layer.handlers import run_file_validator, run_sparql_endpoint_validator
 
 
-def validate_endpoint(body, schema_files: FileStorage):
+def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) -> tuple:
     """
-
-    :param body:
-    :param schema_files:
-    :return:
+    API method to handle file validation.
+    :param body: a dictionary with the fields:
+        :dataset_uri - The dataset URI
+    :param data_file: The file to be validated
+    :param schema_file: The content of the SHACL shape files defining the validation constraints
+    :return: the validation ttl file
+    :rtype: ttl file, int
     """
     dataset_uri = body.get('dataset_uri')
-    endpoint_url = body.get('endpoint_url')
+
+    file_exceptions = list()
+    for file in [data_file.filename, schema_file.filename]:
+        if not _guess_file_type(file):
+            file_exceptions.append(file)
+    if file_exceptions:
+        exception_text = 'File type errors: ' + ', '.join(file_exceptions) + '. Acceptable types: ' + \
+                         ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
+        raise UnsupportedMediaType(exception_text)
+
+    try:
+        with tempfile.TemporaryDirectory() as temp_folder:
+            local_data_file = Path(temp_folder) / str(data_file.filename)
+            data_file.save(local_data_file)
+
+            local_schema_file = Path(temp_folder) / str(schema_file.filename)
+            schema_file.save(local_schema_file)
+
+            # run_file_validator(dataset_uri=str(local_data_file),
+            #                    data_file=str(local_data_file),
+            #                    schemas=[str(local_schema_file)],
+            #                    output=Path(temp_folder))
+
+            return send_from_directory(Path(temp_folder), local_data_file.name, as_attachment=True)  # 200
+    except Exception as e:
+        raise InternalServerError(str(e))
+
+
+def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
+    """
+  
+    :param body: a dictionary with the json fields:
+        :dataset_uri - The dataset URI
+        :sparql_endpoint_url - The endpoint to validate
+        :graphs - An optional list of named graphs to restrict the scope of the validation
+    :param schema_file: The content of the SHACL shape files defining the validation constraints
+    :return: the validation ttl file
+    :rtype: ttl file, int
+    """
+    dataset_uri = body.get('dataset_uri')
+    sparql_endpoint_url = body.get('sparql_endpoint_url')
     graphs = body.get('graphs')
 
-    # validate values
-    # see how to work around the one file bug
-    # use RDFUnit wrapper
+    if not _guess_file_type(schema_file.filename):
+        exception_text = 'File type errors: ' + schema_file.filename + '. Acceptable types: ' + \
+                         ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
+        raise UnsupportedMediaType(exception_text)
 
-    return "Success", 200
+    try:
+        with tempfile.TemporaryDirectory() as temp_folder:
+            local_schema_file = Path(temp_folder) / str(schema_file.filename)
+            schema_file.save(local_schema_file)
+
+            # run_sparql_endpoint_validator(dataset_uri=dataset_uri,
+            #                               sparql_endpoint_uri=sparql_endpoint_url,
+            #                               graphs_uris=graphs,
+            #                               schemas=[str(local_schema_file)],
+            #                               output=Path(temp_folder))
+
+            return send_from_directory(Path(temp_folder), local_schema_file.name, as_attachment=True)  # 200
+    except Exception as e:
+        raise InternalServerError(str(e))

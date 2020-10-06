@@ -21,7 +21,7 @@ __logger = logging.getLogger(__name__)
 
 def __copy_static_content(from_path, to_path):
     if pathlib.Path(from_path).is_dir():
-        copy_tree(from_path,to_path)
+        copy_tree(from_path, to_path)
     else:
         __logger.warning(from_path + " is not a directory !")
 
@@ -72,8 +72,8 @@ def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: Li
 
     cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
                                                       " -d ", dataset_uri,
-                                                      "" if (len(graphs_uris) is 0) else " -g ",
-                                                      "" if (len(graphs_uris) is 0) else ", ".join([graph for graph in graphs_uris]),
+                                                      "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
+                                                          [graph for graph in graphs_uris]),
                                                       " -s " + ", ".join(
                                                           [schema for schema in schemas]),
                                                       " -f " + str(output)
@@ -100,12 +100,12 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("docker")
     cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
-                                                      " -d ",  dataset_uri,
+                                                      " -d ", dataset_uri,
                                                       " -e ", sparql_endpoint_uri,
-                                                      "" if (len(graphs_uris) is 0) else " -g ",
-                                                      "" if (len(graphs_uris) is 0) else ", ".join([graph for graph in graphs_uris]),
+                                                      "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
+                                                          [graph for graph in graphs_uris]),
                                                       " -s ", ", ".join([schema for schema in schemas]),
-                                                      " -f ",  str(output))
+                                                      " -f ", str(output))
     __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 
 
@@ -120,9 +120,7 @@ def generate_validation_report(path_to_report: Path, output: Path) -> None:
     :param path_to_report: the location of the template file(s) that will be used to render the output
     :return: nothing
     """
-    
+
     report_builder = ReportBuilder(path_to_report, output)
     report_builder.add_after_rendering_listener(__copy_static_content)
     report_builder.make_document()
-
-
