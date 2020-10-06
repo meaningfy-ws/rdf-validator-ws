@@ -44,8 +44,8 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
 
     __logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
-    validator_wrapper = RDFUnitWrapper("docker")
-    cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
+    validator_wrapper = RDFUnitWrapper("java")
+    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/app/rdfunit-validate.jar",
                                                       " -d ", dataset_uri,
                                                       " -u ", data_file,
                                                       " -s ", ", ".join([schema for schema in schemas]),
@@ -68,9 +68,9 @@ def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: Li
 
     __logger.info("RDFUnitWrapper' starting ...")
     validator_wrapper: AbstractValidatorWrapper
-    validator_wrapper = RDFUnitWrapper("docker")
+    validator_wrapper = RDFUnitWrapper("java")
 
-    cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
+    cli_output = validator_wrapper.execute_subprocess("-jar", "-jar", "/usr/src/app/rdfunit-validate.jar",
                                                       " -d ", dataset_uri,
                                                       "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
                                                           [graph for graph in graphs_uris]),
@@ -98,8 +98,8 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
 
     __logger.info("RDFUnitWrapper' starting ...")
     validator_wrapper: AbstractValidatorWrapper
-    validator_wrapper = RDFUnitWrapper("docker")
-    cli_output = validator_wrapper.execute_subprocess("run", "aksw/rdfunit",
+    validator_wrapper = RDFUnitWrapper("java")
+    cli_output = validator_wrapper.execute_subprocess("-jar", "-jar", "/usr/src/app/rdfunit-validate.jar",
                                                       " -d ", dataset_uri,
                                                       " -e ", sparql_endpoint_uri,
                                                       "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
