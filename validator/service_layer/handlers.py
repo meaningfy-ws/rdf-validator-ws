@@ -47,14 +47,14 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
     __logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
-    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/app/rdfunit-validate.jar",
-                                                      " -d ", dataset_uri,
-                                                      " -u ", data_file,
-                                                      " -s ", ", ".join([schema for schema in schemas]),
-                                                      " -f ", str(output))
+    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/rdfunit/rdfunit-validate.jar",
+                                                      "-d", dataset_uri,
+                                                      "-u", data_file,
+                                                      "-s", ", ".join([schema for schema in schemas]),
+                                                      "-f", str(output))
     __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
-    return Path(output) / "results" / (data_file + ".shaclTestCaseResult.html")
-
+    file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(data_file).name + ".aggregatedTestCaseResult.html"
+    return Path(output) / 'results' / file_name
 
 def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: List[str], output: Path) -> str:
     """
