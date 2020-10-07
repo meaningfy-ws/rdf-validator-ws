@@ -53,7 +53,7 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
                                                       " -s ", ", ".join([schema for schema in schemas]),
                                                       " -f ", str(output))
     __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
-    return Path(output) / "results" / (data_file + "aggregatedTestCaseResult.html")
+    return Path(output) / "results" / (data_file + ".shaclTestCaseResult.html")
 
 
 def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: List[str], output: Path) -> str:
