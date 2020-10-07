@@ -10,9 +10,10 @@ OpenAPI method handlers.
 """
 import logging
 import tempfile
+import traceback
 from pathlib import Path
 
-from flask import send_file
+from flask import send_file, send_from_directory
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 
@@ -86,12 +87,13 @@ def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
             local_schema_file = Path(temp_folder) / str(schema_file.filename)
             schema_file.save(local_schema_file)
 
-            # run_sparql_endpoint_validator(dataset_uri=dataset_uri,
-            #                               sparql_endpoint_uri=sparql_endpoint_url,
-            #                               graphs_uris=graphs,
-            #                               schemas=[str(local_schema_file)],
-            #                               output=Path(temp_folder))
+            location = run_sparql_endpoint_validator(dataset_uri=dataset_uri,
+                                          sparql_endpoint_uri=sparql_endpoint_url,
+                                          graphs_uris=graphs,
+                                          schemas=[str(local_schema_file)],
+                                          output=str(Path(temp_folder)) + '/')
 
-            return send_from_directory(Path(temp_folder), local_schema_file.name, as_attachment=True)  # 200
+            return send_file(location, as_attachment=True)  # 200
     except Exception as e:
+        __logger.exception(e)
         raise InternalServerError(str(e))
