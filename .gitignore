@@ -130,3 +130,5 @@ dmypy.json
 
 # JetBrains
 .idea/
+/tests/test-data/op-example/results/
+/tests/test-data/op-example/tests/
