@@ -11,20 +11,20 @@ services:
     container_name: validator-api
     build:
       context: .
-      dockerfile: ./compose/local/api/Dockerfile
+      dockerfile: compose/dev/api/Dockerfile
     volumes:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
-    env_file: ./compose/local/api/.dev
+    env_file: compose/dev/api/.dev
 
   validator-ui:
     container_name: validator-ui
     build:
       context: .
-      dockerfile: ./compose/local/ui/Dockerfile
+      dockerfile: compose/dev/ui/Dockerfile
     volumes:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_UI_PORT}:${VALIDATOR_UI_PORT}
-    env_file: ./compose/local/ui/.dev
+    env_file: compose/dev/ui/.dev
