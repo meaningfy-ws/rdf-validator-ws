@@ -10,17 +10,18 @@ OpenAPI method handlers.
 """
 import logging
 import tempfile
-import traceback
 from pathlib import Path
 
-from flask import send_file, send_from_directory
+from flask import send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 
 from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES
-from validator.service_layer.handlers import run_file_validator, run_sparql_endpoint_validator
+from validator.service_layer.handlers import run_file_validator, run_sparql_endpoint_validator, \
+    prepare_eds4jinja_context, generate_validation_report
 
 __logger = logging.getLogger(__name__)
+
 
 def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) -> tuple:
     """
@@ -32,7 +33,6 @@ def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) 
     :return: the validation ttl file
     :rtype: ttl file, int
     """
-    dataset_uri = body.get('dataset_uri')
 
     file_exceptions = list()
     for file in [data_file.filename, schema_file.filename]:
@@ -51,12 +51,15 @@ def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) 
             local_schema_file = Path(temp_folder) / str(schema_file.filename)
             schema_file.save(local_schema_file)
 
-            location = run_file_validator(dataset_uri=str(local_data_file),
+            locations = run_file_validator(dataset_uri=str(local_data_file),
                                           data_file=str(local_data_file),
                                           schemas=[str(local_schema_file)],
                                           output=str(Path(temp_folder)) + '/')
 
-            return send_file(location, as_attachment=True)  # 200
+            prepare_eds4jinja_context(temp_folder, locations[1])
+            report_path = generate_validation_report(temp_folder)
+
+            return send_file(report_path, as_attachment=True)  # 200
     except Exception as e:
         __logger.exception(e)
         raise InternalServerError(str(e))
@@ -73,6 +76,7 @@ def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
     :return: the validation ttl file
     :rtype: ttl file, int
     """
+
     dataset_uri = body.get('dataset_uri')
     sparql_endpoint_url = body.get('sparql_endpoint_url')
     graphs = body.get('graphs')
@@ -87,13 +91,16 @@ def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
             local_schema_file = Path(temp_folder) / str(schema_file.filename)
             schema_file.save(local_schema_file)
 
-            location = run_sparql_endpoint_validator(dataset_uri=dataset_uri,
-                                          sparql_endpoint_uri=sparql_endpoint_url,
-                                          graphs_uris=graphs,
-                                          schemas=[str(local_schema_file)],
-                                          output=str(Path(temp_folder)) + '/')
+            locations = run_sparql_endpoint_validator(dataset_uri=dataset_uri,
+                                                     sparql_endpoint_uri=sparql_endpoint_url,
+                                                     graphs_uris=graphs,
+                                                     schemas=[str(local_schema_file)],
+                                                     output=str(Path(temp_folder)) + '/')
 
-            return send_file(location, as_attachment=True)  # 200
+            prepare_eds4jinja_context(temp_folder, locations[1])
+            report_path = generate_validation_report(temp_folder)
+
+            return send_file(report_path, as_attachment=True)  # 200
     except Exception as e:
         __logger.exception(e)
         raise InternalServerError(str(e))

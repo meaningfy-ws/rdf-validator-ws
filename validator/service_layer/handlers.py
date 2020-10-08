@@ -6,6 +6,7 @@
 # Email: mclaurentiu79@gmail.com
 
 """ """
+import json
 import logging
 import pathlib
 from distutils.dir_util import copy_tree
@@ -27,7 +28,7 @@ def __copy_static_content(from_path, to_path):
         __logger.warning(from_path + " is not a directory !")
 
 
-def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], output: Path) -> str:
+def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], output: Path) -> tuple:
     """
         Execute the RDF Unit or any other validator.
         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
@@ -55,8 +56,12 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
                                                       "-o", 'html,ttl',
                                                       "-f", str(output))
     __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
-    file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(data_file).name + ".shaclTestCaseResult.html"
-    return Path(output) / 'results' / file_name
+
+    output_file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(
+        data_file).name + ".shaclTestCaseResult"
+    output_file_full_path = Path(output) / 'results' / output_file_name
+    return str(output_file_full_path) + ".html", str(output_file_full_path) + ".ttl"
+
 
 # def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: List[str], output: Path) -> str:
 #     """
@@ -96,7 +101,7 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
 
 
 def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, graphs_uris: List[str],
-                                  schemas: List[str], output: Path) -> str:
+                                  schemas: List[str], output: Path) -> tuple:
     """
         Execute the RDF Unit or any other validator.
         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
@@ -110,7 +115,7 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
 
-    __logger.info("RDFUnitWrapper' starting ...")
+    __logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
 
@@ -132,12 +137,12 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     parsed_uri = urlparse(dataset_uri)
     output_file_name = parsed_uri.netloc.replace(":", "_") + \
                        parsed_uri.path.replace("/", "_") + \
-                       ".shaclTestCaseResult.html"
+                       ".shaclTestCaseResult"
+    output_file_path = Path(output) / 'results' / output_file_name
+    return str(output_file_path) + ".html", str(output_file_path) + ".ttl"
 
-    return Path(output) / 'results' / output_file_name
 
-
-def generate_validation_report(path_to_report: Path, output: Path) -> None:
+def generate_validation_report(path_to_report: Path) -> str:
     """
         Generate the jinja HTML report.
         Warning: we have to decide what will be the report sources.
@@ -149,6 +154,19 @@ def generate_validation_report(path_to_report: Path, output: Path) -> None:
     :return: nothing
     """
 
-    report_builder = ReportBuilder(path_to_report, output)
+    report_builder = ReportBuilder(path_to_report)
     report_builder.add_after_rendering_listener(__copy_static_content)
     report_builder.make_document()
+    return str(path_to_report) + "/output/" + "main.html"
+
+
+def prepare_eds4jinja_context(report_path, source_file):
+    copy_tree("templates/rdfunit-shacl-report/", report_path)
+
+    with open(Path(report_path) / "config.json", 'r+') as config_file:
+        config = json.load(config_file)
+        config["conf"]["report_data_file"] = source_file
+        __logger.info(config)
+        config_file.seek(0)
+        json.dump(config, config_file)
+        config_file.truncate()
