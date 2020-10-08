@@ -48,7 +48,6 @@ def test_validate_file(mock_post, ui_client):
     assert 'Validate File' in title.get_text()
 
     data = {
-        'dataset_uri': 'http://data.set',
         'data_file': FileStorage(BytesIO(b'data file content'), 'data.rdf'),
         'schema_file': FileStorage(BytesIO(b'schema file content'), 'schema.rdf'),
     }
@@ -94,7 +93,6 @@ def test_validate_sparql_endpoint(mock_post, ui_client):
     assert 'Validate SPARQL Endpoint' in title.get_text()
 
     data = {
-        'dataset_uri': 'http://data.set',
         'endpoint_url': 'http://endpoint.url',
         'schema_file': FileStorage(BytesIO(b'schema file content'), 'schema.rdf'),
         'graphs': 'graph1 graph2'
