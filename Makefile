@@ -1,6 +1,6 @@
 .PHONY: test install lint generate-tests-from-features
 
-include compose/local/api/.dev
+include compose/dev/api/.dev
 
 BUILD_PRINT = \e[1;34mSTEP: \e[0m
 

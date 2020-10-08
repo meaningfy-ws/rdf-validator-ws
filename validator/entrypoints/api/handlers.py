@@ -8,29 +8,28 @@
 """
 OpenAPI method handlers.
 """
+import logging
 import tempfile
 from pathlib import Path
 
-from flask import send_from_directory
+from flask import send_from_directory, send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import UnsupportedMediaType, InternalServerError
 
 from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES
-from validator.service_layer.handlers import run_file_validator, run_sparql_endpoint_validator
+from validator.service_layer.handlers import run_file_validator
+
+__logger = logging.getLogger(__name__)
 
 
-def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) -> tuple:
+def validate_file(data_file: FileStorage, schema_file: FileStorage) -> tuple:
     """
     API method to handle file validation.
-    :param body: a dictionary with the fields:
-        :dataset_uri - The dataset URI
     :param data_file: The file to be validated
     :param schema_file: The content of the SHACL shape files defining the validation constraints
     :return: the validation ttl file
     :rtype: ttl file, int
     """
-    dataset_uri = body.get('dataset_uri')
-
     file_exceptions = list()
     for file in [data_file.filename, schema_file.filename]:
         if not _guess_file_type(file):
@@ -48,13 +47,13 @@ def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) 
             local_schema_file = Path(temp_folder) / str(schema_file.filename)
             schema_file.save(local_schema_file)
 
-            # run_file_validator(dataset_uri=str(local_data_file),
-            #                    data_file=str(local_data_file),
-            #                    schemas=[str(local_schema_file)],
-            #                    output=Path(temp_folder))
+            location = run_file_validator(data_file=str(local_data_file),
+                                          schemas=[str(local_schema_file)],
+                                          output=str(Path(temp_folder)) + '/')
 
-            return send_from_directory(Path(temp_folder), local_data_file.name, as_attachment=True)  # 200
+            return send_file(location, as_attachment=True)  # 200
     except Exception as e:
+        __logger.exception(e)
         raise InternalServerError(str(e))
 
 

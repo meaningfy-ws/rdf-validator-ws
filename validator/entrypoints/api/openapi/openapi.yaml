@@ -32,9 +32,6 @@ paths:
             schema:
               type: object
               properties:
-                dataset_uri:
-                  type: string
-                  description: The dataset URI 
                 data_file:
                   type: string
                   format: binary
@@ -44,7 +41,6 @@ paths:
                   format: binary
                   description: The content of the SHACL shape files defining the validation constraints
               required:
-                  - dataset_uri
                   - data_file
                   - schema_file
       responses:
