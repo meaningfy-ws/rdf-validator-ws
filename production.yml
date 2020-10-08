@@ -1,17 +1,38 @@
 version: '3.7'
 
 services:
+  maintainance:
+    container_name: maintainance
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./compose/production/nginx:/usr/share/nginx/html
+
   itb:
-    build: compose/production/itb
     container_name: generic-validator
+    build: compose/production/itb
     ports:
       - 9090:8080
 
   validator-api:
     container_name: validator-api
-    build: .
+    build:
+      context: .
+      dockerfile: ./compose/production/api/Dockerfile
     volumes:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
     env_file: compose/production/api/.prod
+
+  validator-ui:
+    container_name: validator-ui
+    build:
+      context: .
+      dockerfile: ./compose/production/ui/Dockerfile
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - ${VALIDATOR_UI_PORT}:${VALIDATOR_UI_PORT}
+    env_file: ./compose/production/ui/.prod
