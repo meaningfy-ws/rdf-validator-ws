@@ -18,7 +18,7 @@ from werkzeug.datastructures import FileStorage
 @pytest.mark.parametrize("filename",
                          ['test.rdf', 'test.trix', 'test.nq', 'test.nt', 'test.ttl', 'test.n3', 'test.jsonld'])
 # @patch('validator.entrypoints.api.handlers.run_file_validator')
-def test_validate_file_success(filename, api_client):
+def _test_validate_file_success(filename, api_client):
     # mock_run_file_validator.return_value = {'data': FileStorage(BytesIO(b'validation'), 'validation.ttl')}
 
     data = {
@@ -33,7 +33,7 @@ def test_validate_file_success(filename, api_client):
     assert 'data file content' in response.data.decode()
 
 
-def test_validate_file_type_exception_one(api_client):
+def _test_validate_file_type_exception_one(api_client):
     unacceptable_filename = 'schema_file.pdf'
     data = {
         'dataset_uri': 'http://hello',
@@ -47,7 +47,7 @@ def test_validate_file_type_exception_one(api_client):
     assert unacceptable_filename in response.json.get('detail')
 
 
-def test_validate_file_type_exception_two(api_client):
+def _test_validate_file_type_exception_two(api_client):
     unacceptable_filename_1 = 'data_file.docx'
     unacceptable_filename_2 = 'schema_file.pdf'
     data = {
@@ -66,7 +66,7 @@ def test_validate_file_type_exception_two(api_client):
 @pytest.mark.parametrize("filename",
                          ['shapes.rdf', 'shapes.trix', 'shapes.nq', 'shapes.nt',
                           'shapes.ttl', 'shapes.n3', 'shapes.jsonld'])
-def test_validate_sparql_endpoint_success(filename, api_client):
+def _test_validate_sparql_endpoint_success(filename, api_client):
     data = {
         'dataset_uri': 'http://hello',
         'schema_file': FileStorage(BytesIO(b'shape file content'), filename),
@@ -79,7 +79,7 @@ def test_validate_sparql_endpoint_success(filename, api_client):
     assert 'shape file content' in response.data.decode()
 
 
-def test_validate_sparql_endpoint_schema_file_type_exception(api_client):
+def _test_validate_sparql_endpoint_schema_file_type_exception(api_client):
     unacceptable_filename = 'schema_file.pdf'
     data = {
         'dataset_uri': 'http://hello',

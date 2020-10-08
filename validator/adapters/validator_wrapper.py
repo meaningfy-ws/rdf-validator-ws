@@ -32,9 +32,9 @@ class AbstractValidatorWrapper(abc.ABC):
 
     def execute_subprocess(self, *args):
         self.__logger.info('Subprocess starting: ' + self.__COMMAND__)
-
+        
         process = Popen(
-            [self.__COMMAND__, args],
+            [self.__COMMAND__, *args],
             stdout=PIPE)
         output, _ = process.communicate()
 

@@ -6,6 +6,7 @@
 # Email: mclaurentiu79@gmail.com
 
 """ """
+import json
 import logging
 import pathlib
 from distutils.dir_util import copy_tree
@@ -17,17 +18,17 @@ from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
 
-__logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def __copy_static_content(from_path, to_path):
     if pathlib.Path(from_path).is_dir():
         copy_tree(from_path, to_path)
     else:
-        __logger.warning(from_path + " is not a directory !")
+        logger.warning(from_path + " is not a directory !")
 
 
-def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], output: Path) -> str:
+def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], output: Path) -> tuple:
     """
         Execute the RDF Unit or any other validator.
         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
@@ -36,63 +37,71 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
     :param schemas: schemas also required for running an evaluation
     :param dataset_uri: states a URI that relates to the tested dataset
     :param output: the output directory
-    :return: nothing
+    :return: a tuple of the output file paths
 
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
     if dataset_uri != data_file:
-        __logger.fatal("dataset_uri must be the same as data_file")
+        logger.fatal("dataset_uri must be the same as data_file")
         raise Exception("dataset_uri must be the same as data_file")
 
-    __logger.info("RDFUnitWrapper starting ...")
+    logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
-    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/app/rdfunit-validate.jar",
-                                                      " -d ", dataset_uri,
-                                                      " -u ", data_file,
-                                                      " -s ", ", ".join([schema for schema in schemas]),
-                                                      " -f ", str(output))
-    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
-    return Path(output) / "results" / (data_file + ".shaclTestCaseResult.html")
+    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/rdfunit/rdfunit-validate.jar",
+                                                      "-d", dataset_uri,
+                                                      "-u", data_file,
+                                                      "-s", ", ".join([schema for schema in schemas]),
+                                                      "-r", 'shacl',
+                                                      "-o", 'html,ttl',
+                                                      "-f", str(output))
+    logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+
+    output_file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(
+        data_file).name + ".shaclTestCaseResult"
+    output_file_full_path = Path(output) / 'results' / output_file_name
+    return str(output_file_full_path) + ".html", str(output_file_full_path) + ".ttl"
 
 
-def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: List[str], output: Path) -> str:
-    """
-        Execute the RDF Unit or any other validator.
-        Possibilities: upload output to a SPARQL endpoint, or write it into a file.
-    :param graphs_uris: the URIs of the graphs
-    :param dataset_uri: states a URI that relates to the tested dataset
-    :param schemas: schemas also required for running an evaluation
-    :param output: the output directory
-    :return: nothing
-
-    Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
-    """
-
-    __logger.info("RDFUnitWrapper' starting ...")
-    validator_wrapper: AbstractValidatorWrapper
-    validator_wrapper = RDFUnitWrapper("java")
-
-    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/app/rdfunit-validate.jar",
-                                                      " -d ", dataset_uri,
-                                                      "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
-                                                          [graph for graph in graphs_uris]),
-                                                      " -s " + ", ".join(
-                                                          [schema for schema in schemas]),
-                                                      " -f " + str(output)
-                                                      )
-    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
-
-    parsed_uri = urlparse(dataset_uri)
-    output_file_name = parsed_uri.netloc.replace(":", "_") + \
-                       parsed_uri.path.replace("/", "_") + \
-                       ".shaclTestCaseResult.html"
-
-    return Path(output) / "results" / output_file_name
+# def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: List[str], output: Path) -> str:
+#     """
+#         Execute the RDF Unit or any other validator.
+#         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
+#     :param graphs_uris: the URIs of the graphs
+#     :param dataset_uri: states a URI that relates to the tested dataset
+#     :param schemas: schemas also required for running an evaluation
+#     :param output: the output directory
+#     :return: nothing
+#
+#     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
+#     """
+#
+#     logger.info("RDFUnitWrapper' starting ...")
+#     validator_wrapper: AbstractValidatorWrapper
+#     validator_wrapper = RDFUnitWrapper("java")
+#
+#     cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/app/rdfunit-validate.jar",
+#                                                       "-d", dataset_uri,
+#                                                       "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
+#                                                           [graph for graph in graphs_uris]),
+#                                                       "-s" + ", ".join(
+#                                                           [schema for schema in schemas]),
+#                                                       "-r", 'shacl',
+#                                                       "-o", 'html,ttl',
+#                                                       "-f" + str(output)
+#                                                       )
+#     logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+#
+#     parsed_uri = urlparse(dataset_uri)
+#     output_file_name = parsed_uri.netloc.replace(":", "_") + \
+#                        parsed_uri.path.replace("/", "_") + \
+#                        ".shaclTestCaseResult.html"
+#
+#     return Path(output) / "results" / output_file_name
 
 
 def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, graphs_uris: List[str],
-                                  schemas: List[str], output: Path) -> str:
+                                  schemas: List[str], output: Path) -> tuple:
     """
         Execute the RDF Unit or any other validator.
         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
@@ -101,32 +110,39 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     :param graphs_uris: the URIs of the graphs
     :param schemas: schemas also required for running an evaluation
     :param output: the output directory
-    :return: nothing
+    :return: a tuple of the output file paths
 
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
 
-    __logger.info("RDFUnitWrapper' starting ...")
+    logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
-    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/app/rdfunit-validate.jar",
-                                                      " -d ", dataset_uri,
-                                                      " -e ", sparql_endpoint_uri,
-                                                      "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
-                                                          [graph for graph in graphs_uris]),
-                                                      " -s ", ", ".join([schema for schema in schemas]),
-                                                      " -f ", str(output))
-    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+
+    if graphs_uris is None or len(graphs_uris) == 0:
+        graph_param = ""
+    else:
+        graph_param = "-g" + ", ".join([graph for graph in graphs_uris])
+
+    cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/rdfunit/rdfunit-validate.jar",
+                                                      "-d", dataset_uri,
+                                                      "-e", sparql_endpoint_uri,
+                                                      graph_param,
+                                                      "-s", ", ".join([schema for schema in schemas]),
+                                                      "-r", 'shacl',
+                                                      "-o", 'html,ttl',
+                                                      "-f", str(output))
+    logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 
     parsed_uri = urlparse(dataset_uri)
     output_file_name = parsed_uri.netloc.replace(":", "_") + \
                        parsed_uri.path.replace("/", "_") + \
-                       ".shaclTestCaseResult.html"
+                       ".shaclTestCaseResult"
+    output_file_path = Path(output) / 'results' / output_file_name
+    return str(output_file_path) + ".html", str(output_file_path) + ".ttl"
 
-    return Path(output) / "results" / output_file_name
 
-
-def generate_validation_report(path_to_report: Path, output: Path) -> None:
+def generate_validation_report(path_to_report: Path) -> str:
     """
         Generate the jinja HTML report.
         Warning: we have to decide what will be the report sources.
@@ -138,6 +154,19 @@ def generate_validation_report(path_to_report: Path, output: Path) -> None:
     :return: nothing
     """
 
-    report_builder = ReportBuilder(path_to_report, output)
+    report_builder = ReportBuilder(path_to_report)
     report_builder.add_after_rendering_listener(__copy_static_content)
     report_builder.make_document()
+    return str(path_to_report) + "/output/" + "main.html"
+
+
+def prepare_eds4jinja_context(report_path, source_file):
+    copy_tree("templates/rdfunit-shacl-report/", report_path)
+
+    with open(Path(report_path) / "config.json", 'r+') as config_file:
+        config = json.load(config_file)
+        config["conf"]["report_data_file"] = source_file
+        logger.info(config)
+        config_file.seek(0)
+        json.dump(config, config_file)
+        config_file.truncate()
