@@ -2,4 +2,5 @@ requests
 connexion[swagger-ui]
 
 rdflib
+python-dotenv
 git+https://github.com/meaningfy-ws/eds4jinja2

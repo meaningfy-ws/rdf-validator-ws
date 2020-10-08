@@ -4,3 +4,5 @@ FLASK_APP=validator.entrypoints.api.run_dev
 FLASK_ENV=development
 
 VALIDATOR_UI_PORT=3050
+
+RDFUNIT_DELAY_MS=1
