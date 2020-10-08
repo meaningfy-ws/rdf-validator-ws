@@ -9,6 +9,8 @@
 Helper methods
 
 """
+from pathlib import Path
+
 from rdflib.util import guess_format
 
 INPUT_MIME_TYPES = {
@@ -21,8 +23,19 @@ INPUT_MIME_TYPES = {
     'ttl': 'text/turtle',
 }
 
+HTML_EXTENSION = 'html'
+TTL_EXTENSION = 'ttl'
+ZIP_EXTENSION = 'zip'
+
+REPORT_EXTENSIONS = [TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION]
+DEFAULT_REPORT_EXTENSION = REPORT_EXTENSIONS[0]
+
 
 def _guess_file_type(file: str, accepted_types: dict = None):
     if accepted_types is None:
         accepted_types = INPUT_MIME_TYPES
     return guess_format(str(file), accepted_types)
+
+
+def get_report_name(filename: str, type: str = TTL_EXTENSION) -> str:
+    return Path(filename).stem + f'-report.{type}'

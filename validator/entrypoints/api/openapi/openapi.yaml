@@ -25,6 +25,11 @@ paths:
     post:
       operationId: validator.entrypoints.api.handlers.validate_file
       description: Validate a an RDF file with the provided SHACL shapes.
+      parameters:
+        - name: report_extension
+          in: query
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -41,8 +46,8 @@ paths:
                   format: binary
                   description: The content of the SHACL shape files defining the validation constraints
               required:
-                  - data_file
-                  - schema_file
+                - data_file
+                - schema_file
       responses:
         200:
           description: Request to validate endpoint successfully accepted for processing.
@@ -72,8 +77,8 @@ paths:
                   format: binary
                   description: The content of the SHACL shape files defining the validation constraints
               required:
-                  - sparql_endpoint_url
-                  - schema_file
+                - sparql_endpoint_url
+                - schema_file
       responses:
         200:
           description: Request to validate endpoint successfully accepted for processing.
