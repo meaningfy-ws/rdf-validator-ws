@@ -20,7 +20,7 @@ from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES
 from validator.service_layer.handlers import run_file_validator, run_sparql_endpoint_validator, \
     prepare_eds4jinja_context, generate_validation_report
 
-__logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) -> tuple:
@@ -61,7 +61,7 @@ def validate_file(body: dict, data_file: FileStorage, schema_file: FileStorage) 
 
             return send_file(report_path, as_attachment=True)  # 200
     except Exception as e:
-        __logger.exception(e)
+        logger.exception(e)
         raise InternalServerError(str(e))
 
 
@@ -102,5 +102,5 @@ def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
 
             return send_file(report_path, as_attachment=True)  # 200
     except Exception as e:
-        __logger.exception(e)
+        logger.exception(e)
         raise InternalServerError(str(e))

@@ -18,14 +18,14 @@ from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
 
-__logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def __copy_static_content(from_path, to_path):
     if pathlib.Path(from_path).is_dir():
         copy_tree(from_path, to_path)
     else:
-        __logger.warning(from_path + " is not a directory !")
+        logger.warning(from_path + " is not a directory !")
 
 
 def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], output: Path) -> tuple:
@@ -37,15 +37,15 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
     :param schemas: schemas also required for running an evaluation
     :param dataset_uri: states a URI that relates to the tested dataset
     :param output: the output directory
-    :return: nothing
+    :return: a tuple of the output file paths
 
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
     if dataset_uri != data_file:
-        __logger.fatal("dataset_uri must be the same as data_file")
+        logger.fatal("dataset_uri must be the same as data_file")
         raise Exception("dataset_uri must be the same as data_file")
 
-    __logger.info("RDFUnitWrapper starting ...")
+    logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
     cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/rdfunit/rdfunit-validate.jar",
@@ -55,7 +55,7 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
                                                       "-r", 'shacl',
                                                       "-o", 'html,ttl',
                                                       "-f", str(output))
-    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+    logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 
     output_file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(
         data_file).name + ".shaclTestCaseResult"
@@ -76,7 +76,7 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
 #     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
 #     """
 #
-#     __logger.info("RDFUnitWrapper' starting ...")
+#     logger.info("RDFUnitWrapper' starting ...")
 #     validator_wrapper: AbstractValidatorWrapper
 #     validator_wrapper = RDFUnitWrapper("java")
 #
@@ -90,7 +90,7 @@ def run_file_validator(dataset_uri: str, data_file: str, schemas: List[str], out
 #                                                       "-o", 'html,ttl',
 #                                                       "-f" + str(output)
 #                                                       )
-#     __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+#     logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 #
 #     parsed_uri = urlparse(dataset_uri)
 #     output_file_name = parsed_uri.netloc.replace(":", "_") + \
@@ -110,12 +110,12 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
     :param graphs_uris: the URIs of the graphs
     :param schemas: schemas also required for running an evaluation
     :param output: the output directory
-    :return: nothing
+    :return: a tuple of the output file paths
 
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
 
-    __logger.info("RDFUnitWrapper starting ...")
+    logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
 
@@ -132,7 +132,7 @@ def run_sparql_endpoint_validator(dataset_uri: str, sparql_endpoint_uri: str, gr
                                                       "-r", 'shacl',
                                                       "-o", 'html,ttl',
                                                       "-f", str(output))
-    __logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+    logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
 
     parsed_uri = urlparse(dataset_uri)
     output_file_name = parsed_uri.netloc.replace(":", "_") + \
@@ -166,7 +166,7 @@ def prepare_eds4jinja_context(report_path, source_file):
     with open(Path(report_path) / "config.json", 'r+') as config_file:
         config = json.load(config_file)
         config["conf"]["report_data_file"] = source_file
-        __logger.info(config)
+        logger.info(config)
         config_file.seek(0)
         json.dump(config, config_file)
         config_file.truncate()
