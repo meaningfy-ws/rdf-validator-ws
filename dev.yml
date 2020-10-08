@@ -6,6 +6,8 @@ services:
     container_name: generic-validator
     ports:
       - 9090:8080
+    networks:
+      - mydefault
 
   validator-api:
     container_name: validator-api
@@ -17,6 +19,8 @@ services:
     ports:
       - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
     env_file: compose/dev/api/.dev
+    networks:
+      - mydefault
 
   validator-ui:
     container_name: validator-ui
@@ -28,3 +32,10 @@ services:
     ports:
       - ${VALIDATOR_UI_PORT}:${VALIDATOR_UI_PORT}
     env_file: compose/dev/ui/.dev
+    networks:
+      - mydefault
+
+
+networks:
+  mydefault:
+    name: globalnet
