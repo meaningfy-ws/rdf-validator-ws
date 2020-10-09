@@ -24,11 +24,6 @@ service | URL | info
 
 ![validate sparql page](docs/images/validate-sparql-endpoint.png)
 
-### Interoperability Test Bed
->Go to this link [http://localhost:9090/shacl/any/upload](http://http://localhost:9090/shacl/any/upload) to access the online definition of the API.<br>
->Access the API by accessing this link [http://localhost:9090/shacl/any/api](http://localhost:9090/shacl/any/api).
-
-## [Use-Cases Covered](usecase_description.md)
 
 ## Installation
 Make sure that you are running `Docker` and have the correct permissions set.
