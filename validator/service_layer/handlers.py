@@ -8,14 +8,13 @@
 """ """
 import json
 import logging
-import os
 from distutils.dir_util import copy_tree
 from pathlib import Path
 from typing import List, Union
 from urllib.parse import urlparse
 
 from eds4jinja2.builders.report_builder import ReportBuilder
-from dotenv import load_dotenv
+
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
 from validator.config import RDFUNIT_QUERY_DELAY_MS
 
@@ -52,7 +51,6 @@ def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Pa
                                                       "-o", 'html,ttl',
                                                       "-f", str(output))
     logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
-
 
     output_file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(
         data_file).name + ".shaclTestCaseResult"
