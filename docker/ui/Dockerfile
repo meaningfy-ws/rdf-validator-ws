@@ -10,4 +10,4 @@ COPY . /usr/src/app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-CMD gunicorn --bind 0.0.0.0:${VALIDATOR_UI_PORT} validator.entrypoints.ui.run:app
+CMD gunicorn -w 2 --bind 0.0.0.0:${VALIDATOR_UI_PORT} --reload validator.entrypoints.ui.run:app
