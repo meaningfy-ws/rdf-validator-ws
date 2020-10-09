@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
+from validator.config import RDFUNIT_QUERY_DELAY_MS
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +51,6 @@ def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Pa
                                                       "-o", 'html,ttl',
                                                       "-f", str(output))
     logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
-
 
     output_file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(
         data_file).name + ".shaclTestCaseResult"
@@ -108,9 +108,12 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
 
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
+
     logger.info("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
+
+    sparql_endpoint_url = sparql_endpoint_url.strip()
 
     if graphs_uris is None or len(graphs_uris) == 0:
         graph_param = ""
@@ -123,6 +126,7 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
                                                       graph_param,
                                                       "-s", ", ".join([schema for schema in schemas]),
                                                       "-r", 'shacl',
+                                                      "-C", "-T", "0", "-D", str(RDFUNIT_QUERY_DELAY_MS),
                                                       "-o", 'html,ttl',
                                                       "-f", str(output))
     logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
