@@ -1,8 +1,0 @@
-VALIDATOR_API_PORT=4010
-
-VALIDATOR_UI_PORT=8010
-
-FLASK_APP=validator.entrypoints.api.run_dev
-FLASK_ENV=development
-
-RDFUNIT_QUERY_DELAY_MS=1

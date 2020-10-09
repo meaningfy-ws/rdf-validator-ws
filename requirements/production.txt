@@ -1,7 +1,0 @@
--r common.txt
-
-gunicorn
-
-Flask
-flask-bootstrap
-Flask-Wtf
