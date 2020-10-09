@@ -24,7 +24,7 @@ def _helper_get_request_and_parse(client, url) -> BeautifulSoup:
     return BeautifulSoup(response.data, 'html.parser')
 
 
-def test_index(ui_client):
+def _test_index(ui_client):
     ui_url = '/'
     soup = _helper_get_request_and_parse(ui_client, ui_url)
 
@@ -38,7 +38,7 @@ def test_index(ui_client):
 
 
 @patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def test_validate_file(mock_post, ui_client):
+def _test_validate_file(mock_post, ui_client):
     ui_url = '/validate-file'
     mock_post.return_value = RequestResponse(b'data file content', 200)
 
@@ -55,12 +55,13 @@ def test_validate_file(mock_post, ui_client):
     response = ui_client.post('/validate-file', data=data, follow_redirects=True,
                               content_type='multipart/form-data')
 
+    breakpoint()
     assert response.status_code == 200
     assert b'data file content' == response.data
 
 
 @patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def test_validate_file_type_exception(mock_post, ui_client):
+def _test_validate_file_type_exception(mock_post, ui_client):
     ui_url = '/validate-file'
     exception_content = 'This file type is not supported'
     exception_response = {
@@ -83,7 +84,7 @@ def test_validate_file_type_exception(mock_post, ui_client):
 
 
 @patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def test_validate_sparql_endpoint(mock_post, ui_client):
+def _test_validate_sparql_endpoint(mock_post, ui_client):
     ui_url = '/validate-sparql-endpoint'
     mock_post.return_value = RequestResponse(b'schema file content', 200)
 
@@ -106,7 +107,7 @@ def test_validate_sparql_endpoint(mock_post, ui_client):
 
 
 @patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def test_validate_sparql_endpoint_type_exception(mock_post, ui_client):
+def _test_validate_sparql_endpoint_type_exception(mock_post, ui_client):
     ui_url = '/validate-sparql-endpoint'
     exception_content = 'This file type is not supported'
     exception_response = {

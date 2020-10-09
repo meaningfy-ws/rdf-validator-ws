@@ -12,11 +12,13 @@ from distutils.dir_util import copy_tree
 from pathlib import Path
 from typing import List, Union
 from urllib.parse import urlparse
+from zipfile import ZipFile
 
 from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
 from validator.config import RDFUNIT_QUERY_DELAY_MS
+from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +125,6 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
     cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/rdfunit/rdfunit-validate.jar",
                                                       "-d", sparql_endpoint_url,
                                                       "-e", sparql_endpoint_url,
-                                                      graph_param,
                                                       "-s", ", ".join([schema for schema in schemas]),
                                                       "-r", 'shacl',
                                                       "-C", "-T", "0", "-D", str(RDFUNIT_QUERY_DELAY_MS),
@@ -165,3 +166,54 @@ def prepare_eds4jinja_context(report_path, source_file):
         config_file.seek(0)
         json.dump(config, config_file)
         config_file.truncate()
+
+
+def create_file_name(filename: str, file_type: str = TTL_EXTENSION) -> str:
+    return Path(filename).stem + f'-report.{file_type}'
+
+
+def create_report(location: str, html_report: str, ttl_report: str, extension: str, file_name: str):
+    if extension == TTL_EXTENSION:
+        report_path = ttl_report
+        report_filename = create_file_name(filename=file_name, file_type=TTL_EXTENSION)
+
+    elif extension == HTML_EXTENSION:
+        prepare_eds4jinja_context(location, ttl_report)
+        report_path = generate_validation_report(location)
+        report_filename = create_file_name(filename=file_name, file_type=HTML_EXTENSION)
+
+    elif extension == ZIP_EXTENSION:
+        prepare_eds4jinja_context(location, ttl_report)
+        shacl_html_report = generate_validation_report(location)
+
+        ttl_filename = create_file_name(filename=file_name, file_type=TTL_EXTENSION)
+        html_filename = create_file_name(filename=file_name, file_type=HTML_EXTENSION)
+        shacl_html_filename = create_file_name(filename='shacl-' + file_name, file_type=HTML_EXTENSION)
+        report_filename = create_file_name(filename=file_name, file_type=ZIP_EXTENSION)
+
+        report_path = str(Path(location) / 'report.zip')
+        with ZipFile(report_path, 'w') as zip_report:
+            zip_report.write(html_report, arcname=html_filename)
+            zip_report.write(shacl_html_report, arcname=shacl_html_filename)
+            zip_report.write(ttl_report, arcname=ttl_filename)
+
+    return report_path, report_filename
+
+
+def build_report_from_file(location: str, data_file: str, schema_file: str, extension: str,
+                           file_name: str = 'file') -> tuple:
+    html_report, ttl_report = run_file_validator(data_file=data_file,
+                                                 schemas=[schema_file],
+                                                 output=str(Path(location)) + '/')
+
+    return create_report(location, html_report, ttl_report, extension, file_name)
+
+
+def build_report_from_sparql_endpoint(location: str, endpoint: str, graphs: list, schema_file: str, extension: str,
+                                      file_name: str = 'file') -> tuple:
+    html_report, ttl_report = run_sparql_endpoint_validator(sparql_endpoint_url=endpoint,
+                                                            graphs_uris=graphs,
+                                                            schemas=[schema_file],
+                                                            output=str(Path(location)) + '/')
+
+    return create_report(location, html_report, ttl_report, extension, file_name)
