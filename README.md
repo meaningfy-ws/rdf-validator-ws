@@ -8,12 +8,12 @@ The validator services are split into:
 
 service | URL | info
 ------- | ------- | ----
-`validator-api` | [localhost:3040](http://localhost:3040) | _access [localhost:3040/ui](http://localhost:3040/ui) for the swagger interface_ 
-`validator-ui` | [localhost:3050](http://localhost:3050)
+`validator-api` | [localhost:4010](http://localhost:4010) | _access [localhost:4010/ui](http://localhost:4010/ui) for the swagger interface_ 
+`validator-ui` | [localhost:8010](http://localhost:8010)
 `generic-validator`| [localhost:9090](http://http://localhost:9090/) | [Interoperability Test Bed](https://www.itb.ec.europa.eu/docs/guides/latest/)
 
 ### Validator API
->Go to this link [localhost:3040/ui](http://localhost:3040/ui) to access the online definition of the API.
+>Go to this link [localhost:4010/ui](http://localhost:4010/ui) to access the online definition of the API.
 
 ![swagger page](resources/swagger.png)
 
@@ -76,11 +76,11 @@ make test
 
 ## Usage
 ### `validator-api` examples
-> Validate File: [http://0.0.0.0:3040/validate-file](http://0.0.0.0:3040/validate-file)
+> Validate File: [http://0.0.0.0:4010/validate-file](http://0.0.0.0:4010/validate-file)
 
 ![validate file api example](resources/examples/validate-file.png)
 
-> Validate SPARQL Endpoint: [http://0.0.0.0:3040/validate-sparql-endpoint](http://0.0.0.0:3040/validate-sparql-endpoint)
+> Validate SPARQL Endpoint: [http://0.0.0.0:4010/validate-sparql-endpoint](http://0.0.0.0:4010/validate-sparql-endpoint)
 
 ![validate sparql endpoint api example](resources/examples/validate-sparql-endpoint.png)
 
