@@ -24,7 +24,7 @@ def _helper_get_request_and_parse(client, url) -> BeautifulSoup:
     return BeautifulSoup(response.data, 'html.parser')
 
 
-def test_index(ui_client):
+def _test_index(ui_client):
     ui_url = '/'
     soup = _helper_get_request_and_parse(ui_client, ui_url)
 

@@ -9,6 +9,7 @@
 Helper methods
 
 """
+
 from rdflib.util import guess_format
 
 INPUT_MIME_TYPES = {
@@ -20,6 +21,13 @@ INPUT_MIME_TYPES = {
     'n3': 'text/n3',
     'ttl': 'text/turtle',
 }
+
+HTML_EXTENSION = 'html'
+TTL_EXTENSION = 'ttl'
+ZIP_EXTENSION = 'zip'
+
+REPORT_EXTENSIONS = [TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION]
+DEFAULT_REPORT_EXTENSION = REPORT_EXTENSIONS[0]
 
 
 def _guess_file_type(file: str, accepted_types: dict = None):

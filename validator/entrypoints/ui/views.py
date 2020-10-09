@@ -13,7 +13,7 @@ import tempfile
 from json import loads
 from pathlib import Path
 
-from flask import render_template, flash, send_from_directory
+from flask import render_template, flash, send_from_directory, redirect, url_for
 
 from validator.entrypoints.ui import app
 from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_file, \
@@ -23,7 +23,7 @@ from validator.entrypoints.ui.forms import ValidateFromFileForm, ValidateSPARQLE
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return redirect(url_for('validate_file'))
 
 
 @app.route('/validate-file', methods=['GET', 'POST'])
