@@ -32,7 +32,6 @@ def validate_file():
 
     if form.validate_on_submit():
         response, status = api_validate_file(
-            dataset_uri=form.dataset_uri.data,
             data_file=form.data_file.data,
             schema_file=form.schema_file.data
         )
@@ -53,7 +52,6 @@ def validate_sparql_endpoint():
     form = ValidateSPARQLEndpointForm()
     if form.validate_on_submit():
         response, status = api_validate_sparql_endpoint(
-            dataset_uri=form.dataset_uri.data,
             sparql_endpoint_url=form.endpoint_url.data,
             schema_file=form.schema_file.data,
             graphs=form.graphs.data.split()

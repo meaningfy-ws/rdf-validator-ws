@@ -17,7 +17,6 @@ from wtforms.validators import DataRequired, URL
 
 
 class BaseValidateForm(FlaskForm):
-    dataset_uri = StringField('Dataset URI*', validators=[DataRequired(), URL()])
     schema_file = FileField('Schema file*',
                             validators=[FileRequired()])
     submit = SubmitField('Validate')
