@@ -12,11 +12,15 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
-from wtforms import StringField, SubmitField, TextAreaField
+from wtforms import StringField, SubmitField, TextAreaField, RadioField
 from wtforms.validators import DataRequired, URL
+
+from validator.entrypoints.api.helpers import HTML_EXTENSION, TTL_EXTENSION, ZIP_EXTENSION
 
 
 class BaseValidateForm(FlaskForm):
+    report_extension = RadioField('Report Extension', choices=[(TTL_EXTENSION, 'TTL'), (HTML_EXTENSION, 'HTML'),
+                                                               (ZIP_EXTENSION, 'both types')])
     schema_file = FileField('Schema file*',
                             validators=[FileRequired()])
     submit = SubmitField('Validate')
@@ -28,5 +32,5 @@ class ValidateFromFileForm(BaseValidateForm):
 
 
 class ValidateSPARQLEndpointForm(BaseValidateForm):
-    endpoint_url = StringField('Endpoint URL*', validators=[DataRequired(), URL()])
+    endpoint_url = StringField('Endpoint URL*', validators=[DataRequired()])
     graphs = TextAreaField('Graphs', description='Separate them through spaces. example: graph1 graph2')

@@ -8,17 +8,11 @@
     <form method="post" role="form" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         {{ wtf.form_errors(form, hiddens="only") }}
-        <div>
 
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                {{ wtf.form_field(form.data_file, form_type="basic") }}
-            </div>
-            <div class="col-md-6">
-                {{ wtf.form_field(form.schema_file, form_type="basic" ) }}
-            </div>
-        </div>
+        <label class="control-label" for="report_extension">Choose report type</label>
+        {{ wtf.form_field(form.report_extension) }}
+        {{ wtf.form_field(form.data_file) }}
+        {{ wtf.form_field(form.schema_file) }}
         <div class="row">
             <div class="col-md-6">
                 <button type="submit" id="submit" class="btn btn-primary">{{ title }}</button>

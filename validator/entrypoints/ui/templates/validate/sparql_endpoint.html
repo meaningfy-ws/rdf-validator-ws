@@ -8,6 +8,8 @@
         {{ form.hidden_tag() }}
         {{ wtf.form_errors(form, hiddens="only") }}
 
+        <label class="control-label" for="report_extension">Choose report type</label>
+        {{ wtf.form_field(form.report_extension) }}
         {{ wtf.form_field(form.endpoint_url) }}
         {{ wtf.form_field(form.schema_file) }}
         {{ wtf.form_field(form.graphs) }}

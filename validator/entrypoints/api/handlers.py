@@ -55,6 +55,7 @@ def validate_file(data_file: FileStorage, schema_file: FileStorage,
             local_schema_file = Path(temp_folder) / str(schema_file.filename)
             schema_file.save(local_schema_file)
 
+            print('from handler', report_extension)
             report_path, report_filename = build_report_from_file(temp_folder,
                                                                   str(local_data_file),
                                                                   str(local_schema_file),
