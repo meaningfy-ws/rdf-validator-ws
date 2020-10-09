@@ -9,10 +9,11 @@
         {{ form.hidden_tag() }}
         {{ wtf.form_errors(form, hiddens="only") }}
 
-        <label class="control-label" for="report_extension">Choose report type</label>
-        {{ wtf.form_field(form.report_extension) }}
         {{ wtf.form_field(form.data_file) }}
         {{ wtf.form_field(form.schema_file) }}
+
+        <label class="control-label" for="report_extension">Choose report type</label>
+        {{ wtf.form_field(form.report_extension) }}
         <div class="row">
             <div class="col-md-6">
                 <button type="submit" id="submit" class="btn btn-primary">{{ title }}</button>

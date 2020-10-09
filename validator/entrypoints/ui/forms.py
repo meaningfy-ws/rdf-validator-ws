@@ -19,8 +19,8 @@ from validator.entrypoints.api.helpers import HTML_EXTENSION, TTL_EXTENSION, ZIP
 
 
 class BaseValidateForm(FlaskForm):
-    report_extension = RadioField('Report Extension', choices=[(TTL_EXTENSION, 'TTL'), (HTML_EXTENSION, 'HTML'),
-                                                               (ZIP_EXTENSION, 'both types')])
+    report_extension = RadioField('Report Extension', choices=[(TTL_EXTENSION, 'Turtle report'), (HTML_EXTENSION, 'HTML report'),
+                                                               (ZIP_EXTENSION, 'Both reports')])
     schema_file = FileField('Schema file*',
                             validators=[FileRequired()])
     submit = SubmitField('Validate')
