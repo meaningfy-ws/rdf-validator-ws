@@ -3,34 +3,8 @@
 RDF validator is an online platform for validating RDF data with SHACL shape definitions. It is based on the [RDFUnit](https://github.com/AKSW/RDFUnit) developed at the University of Leipzig. 
 
 
-The validator services are split into:
 
-service | URL | info
-------- | ------- | ----
-`validator-api` | [localhost:4010](http://localhost:4010) | _access [localhost:4010/ui](http://localhost:4010/ui) for the swagger interface_ 
-`validator-ui` | [localhost:8010](http://localhost:8010)
-
-### Validator API
->Go to this link [localhost:4010/ui](http://localhost:4010/ui) to access the online definition of the API.
-
-![swagger page](docs/images/swagger.png)
-
-### Validator UI
-> File Validation page
->
-![validate file page](docs/images/validate-file-page.png)
-
-> SPARQL Validation page
-
-![validate sparql page](docs/images/validate-sparql-endpoint.png)
-
-### Interoperability Test Bed
->Go to this link [http://localhost:9090/shacl/any/upload](http://http://localhost:9090/shacl/any/upload) to access the online definition of the API.<br>
->Access the API by accessing this link [http://localhost:9090/shacl/any/api](http://localhost:9090/shacl/any/api).
-
-## [Use-Cases Covered](usecase_description.md)
-
-## Installation
+# Installation
 Make sure that you are running `Docker` and have the correct permissions set.
 
 ```bash
@@ -41,35 +15,40 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 ---
-### build and run the containers
+
 To create both the API and the UI containers:
 ```bash
 make dev
 ```
+
+Install test/dev dependencies:
+```bash
+make install-dev
+```
+To run the tests:
+```bash
+make test
+```
+
+# Usage
 
 To run the docker containers:
 ```bash
 make start-dev
 ```
 
-To stop the docker containers:
-```bash
-make stop-dev
-```
+The validator services are split into:
 
-### run the tests
-Install test/dev dependencies:
-```bash
-make install-dev
-```
+service | URL | info
+------- | ------- | ----
+`validator-api` | [localhost:4010](http://localhost:4010) | _access [localhost:4010/ui](http://localhost:4010/ui) for the swagger interface_ 
+`validator-ui` | [localhost:8010](http://localhost:8010)
 
-To run the tests:
-```bash
-make test
-```
+## Validator API
+>Go to this link [localhost:4010/ui](http://localhost:4010/ui) to access the online definition of the API.
+![swagger page](docs/images/swagger.png)
 
-## Usage
-### `validator-api` examples
+> Sample execution of the `validator-api` from an API client 
 > Validate File: [http://0.0.0.0:4010/validate-file](http://0.0.0.0:4010/validate-file)
 
 ![validate file api example](docs/images/examples/validate-file.png)
@@ -78,6 +57,29 @@ make test
 
 ![validate sparql endpoint api example](docs/images/examples/validate-sparql-endpoint.png)
 
+
+## Validator UI
+> File Validation page
+>
+![validate file page](docs/images/validate-file-page.png)
+
+> SPARQL Validation page
+
+![validate sparql page](docs/images/validate-sparql-endpoint.png)
+
+
+## Stop services
+
+To stop the docker containers:
+```bash
+make stop-dev
+```
+
+## Performance estimates
+
+Environment: AWS EC2 p2.medium and running the operations with Fuseki triple store.
+
+* Validating a medium NAL (used Treaties) ~ 30s
 
 ## Contributing
 You are more than welcome to help expand and mature this project. We adhere to [Apache code of conduct](https://www.apache.org/foundation/policies/conduct), please follow it in all your interactions on the project.   
