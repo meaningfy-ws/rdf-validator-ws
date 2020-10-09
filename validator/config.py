@@ -12,3 +12,4 @@ Project wide configuration file.
 import os
 
 RDFUNIT_QUERY_DELAY_MS = os.environ.get('RDFUNIT_QUERY_DELAY_MS', 1)
+RDF_VALIDATOR_DEBUG = os.environ.get('RDF_VALIDATOR_DEBUG')

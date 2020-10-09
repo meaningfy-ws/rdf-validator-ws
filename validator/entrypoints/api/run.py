@@ -8,11 +8,14 @@
 """
 Production API server through connexion definitions.
 """
-
+from validator.config import RDF_VALIDATOR_DEBUG
 from validator.entrypoints.api import app
-from validator.entrypoints.flask_config import ProductionConfig
+from validator.entrypoints.flask_config import ProductionConfig, DevelopmentConfig
 
-app.config.from_object(ProductionConfig())
+if RDF_VALIDATOR_DEBUG:
+    app.config.from_object(DevelopmentConfig())
+else:
+    app.config.from_object(ProductionConfig())
 
 if __name__ == '__main__':
     app.run()

@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   itb:
-    build: compose/production/itb
+    build: docker/itb
     container_name: generic-validator
     ports:
       - 9090:8080
@@ -11,27 +11,31 @@ services:
 
   validator-api:
     container_name: validator-api
+    image: meaningfy/rdf-validator-ws-api:latest
     build:
       context: .
-      dockerfile: compose/dev/api/Dockerfile
+      dockerfile: docker/api/Dockerfile
     volumes:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
-    env_file: compose/dev/api/.dev
+    env_file: docker/.env
     networks:
       - mydefault
 
   validator-ui:
     container_name: validator-ui
+    image: meaningfy/rdf-validator-ws-ui:latest
     build:
       context: .
-      dockerfile: compose/dev/ui/Dockerfile
+      dockerfile: docker/ui/Dockerfile
     volumes:
       - .:/usr/src/app
     ports:
       - ${VALIDATOR_UI_PORT}:${VALIDATOR_UI_PORT}
-    env_file: compose/dev/ui/.dev
+    env_file: docker/.env
+    depends_on:
+      - "validator-api"
     networks:
       - mydefault
 

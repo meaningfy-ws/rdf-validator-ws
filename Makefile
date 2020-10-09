@@ -1,6 +1,6 @@
 .PHONY: test install lint generate-tests-from-features
 
-include compose/dev/api/.dev
+include docker/.env
 
 BUILD_PRINT = \e[1;34mSTEP: \e[0m
 
@@ -8,64 +8,52 @@ BUILD_PRINT = \e[1;34mSTEP: \e[0m
 # Basic commands
 #-----------------------------------------------------------------------------
 
-install-prod:
-	@ echo "$(BUILD_PRINT)Installing the production requirements"
-	@ pip install --upgrade pip
-	@ pip install -r requirements.txt
-
 install-dev:
 	@ echo "$(BUILD_PRINT)Installing the local requirements"
 	@ pip install --upgrade pip
 	@ pip install -r requirements/dev.txt
 
+install-prod:
+	@ echo "$(BUILD_PRINT)Installing the production requirements"
+	@ pip install --upgrade pip
+	@ pip install -r requirements.txt
+
 test:
 	@ echo "$(BUILD_PRINT)Running the tests"
 	@ pytest
 
-#-----------------------------------------------------------------------------
-# API server related commands
-#-----------------------------------------------------------------------------
-
-build-dev-api:
+dev:
 	@ echo -e '$(BUILD_PRINT)Building the api container'
-	@ docker-compose --file dev.yml --env-file compose/dev/api/.dev build validator-api
-
-start-dev-api:
-	@ echo -e '$(BUILD_PRINT)Starting the api container'
-	@ docker-compose --file dev.yml --env-file compose/dev/api/.dev up -d validator-api
-
-stop-dev-api:
-	@ echo -e '$(BUILD_PRINT)Stopping the api container'
-	@ docker-compose --file dev.yml --env-file compose/dev/api/.dev stop validator-api
-
-#-----------------------------------------------------------------------------
-# UI server related commands
-#-----------------------------------------------------------------------------
-
-build-dev-ui:
+	@ docker-compose --file dev.yml --env-file docker/.env build validator-api
 	@ echo -e '$(BUILD_PRINT)Building the ui container'
-	@ docker-compose --file dev.yml --env-file compose/dev/ui/.dev build validator-ui
+	@ docker-compose --file dev.yml --env-file docker/.env build validator-ui
 
-start-dev-ui:
-	@ echo -e '$(BUILD_PRINT)Starting the ui container'
-	@ docker-compose --file dev.yml --env-file compose/dev/ui/.dev up -d validator-ui
-
-stop-dev-ui:
-	@ echo -e '$(BUILD_PRINT)Stopping the ui container'
-	@ docker-compose --file dev.yml --env-file compose/dev/ui/.dev stop validator-ui
-
-#-----------------------------------------------------------------------------
-# (all) Development environment
-#-----------------------------------------------------------------------------
-
-build-dev:
-	@ echo -e '$(BUILD_PRINT)Building the dev container'
-	@ docker-compose --file dev.yml --env-file compose/dev/api/.dev build
+prod:
+	@ echo -e '$(BUILD_PRINT)Building the api container'
+	@ docker-compose --file prod.yml --env-file docker/.env build validator-api
+	@ echo -e '$(BUILD_PRINT)Building the ui container'
+	@ docker-compose --file prod.yml --env-file docker/.env build validator-ui
 
 start-dev:
-	@ echo -e '$(BUILD_PRINT)Starting the dev services'
-	@ docker-compose --file dev.yml --env-file compose/dev/api/.dev up -d
+	@ echo -e '$(BUILD_PRINT)Starting the api container'
+	@ docker-compose --file dev.yml --env-file docker/.env up -d validator-api
+	@ echo -e '$(BUILD_PRINT)Starting the ui container'
+	@ docker-compose --file dev.yml --env-file docker/.env up -d validator-ui
 
 stop-dev:
-	@ echo -e '$(BUILD_PRINT)Stopping the dev services'
-	@ docker-compose --file dev.yml --env-file compose/dev/api/.dev stop
+	@ echo -e '$(BUILD_PRINT)Stopping the ui container'
+	@ docker-compose --file dev.yml --env-file docker/.env stop validator-ui
+	@ echo -e '$(BUILD_PRINT)Stopping the api container'
+	@ docker-compose --file dev.yml --env-file docker/.env stop validator-api
+
+start-prod:
+	@ echo -e '$(BUILD_PRINT)Starting PRODUCTION the api container'
+	@ docker-compose --file prod.yml --env-file docker/.env up -d validator-api
+	@ echo -e '$(BUILD_PRINT)Starting the ui container'
+	@ docker-compose --file prod.yml --env-file docker/.env up -d validator-ui
+
+stop-prod:
+	@ echo -e '$(BUILD_PRINT)Stopping  PRODUCTION the ui container'
+	@ docker-compose --file prod.yml --env-file docker/.env stop validator-ui
+	@ echo -e '$(BUILD_PRINT)Stopping the api container'
+	@ docker-compose --file prod.yml --env-file docker/.env stop validator-api
