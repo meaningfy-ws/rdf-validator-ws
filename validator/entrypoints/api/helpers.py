@@ -9,7 +9,6 @@
 Helper methods
 
 """
-from pathlib import Path
 
 from rdflib.util import guess_format
 
@@ -35,7 +34,3 @@ def _guess_file_type(file: str, accepted_types: dict = None):
     if accepted_types is None:
         accepted_types = INPUT_MIME_TYPES
     return guess_format(str(file), accepted_types)
-
-
-def get_report_name(filename: str, type: str = TTL_EXTENSION) -> str:
-    return Path(filename).stem + f'-report.{type}'

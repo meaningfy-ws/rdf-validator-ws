@@ -11,16 +11,14 @@ OpenAPI method handlers.
 import logging
 import tempfile
 from pathlib import Path
-from zipfile import ZipFile
 
 from flask import send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import UnsupportedMediaType, InternalServerError, UnprocessableEntity
 
 from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES, REPORT_EXTENSIONS, \
-    DEFAULT_REPORT_EXTENSION, TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION, get_report_name
-from validator.service_layer.handlers import run_file_validator, run_sparql_endpoint_validator, \
-    prepare_eds4jinja_context, generate_validation_report
+    DEFAULT_REPORT_EXTENSION
+from validator.service_layer.handlers import build_report_from_file, build_report_from_sparql_endpoint
 
 logger = logging.getLogger(__name__)
 
@@ -57,31 +55,10 @@ def validate_file(data_file: FileStorage, schema_file: FileStorage,
             local_schema_file = Path(temp_folder) / str(schema_file.filename)
             schema_file.save(local_schema_file)
 
-            html_report, ttl_report = run_file_validator(data_file=str(local_data_file),
-                                                         schemas=[str(local_schema_file)],
-                                                         output=str(Path(temp_folder)) + '/')
-
-            if report_extension == TTL_EXTENSION:
-                report_path = ttl_report
-                report_filename = get_report_name(filename=data_file.filename, type=TTL_EXTENSION)
-
-            elif report_extension == HTML_EXTENSION:
-                prepare_eds4jinja_context(temp_folder, ttl_report)
-                report_path = generate_validation_report(temp_folder)
-                report_filename = get_report_name(filename=data_file.filename, type=ZIP_EXTENSION)
-
-            elif report_extension == ZIP_EXTENSION:
-                prepare_eds4jinja_context(temp_folder, ttl_report)
-                html_report = generate_validation_report(temp_folder)
-
-                ttl_filename = get_report_name(filename=data_file.filename, type=TTL_EXTENSION)
-                html_filename = get_report_name(filename=data_file.filename, type=HTML_EXTENSION)
-                report_filename = get_report_name(filename=data_file.filename, type=ZIP_EXTENSION)
-
-                report_path = str(Path(temp_folder) / 'report.zip')
-                with ZipFile(report_path, 'w') as zip_report:
-                    zip_report.write(html_report, arcname=html_filename)
-                    zip_report.write(ttl_report, arcname=ttl_filename)
+            report_path, report_filename = build_report_from_file(temp_folder,
+                                                                  str(local_data_file),
+                                                                  str(local_schema_file),
+                                                                  report_extension, data_file.filename)
 
             return send_file(report_path, as_attachment=True, attachment_filename=report_filename)  # 200
     except Exception as e:
@@ -89,13 +66,14 @@ def validate_file(data_file: FileStorage, schema_file: FileStorage,
         raise InternalServerError(str(e))
 
 
-def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
+def validate_sparql_endpoint(body, schema_file: FileStorage, report_extension: str = DEFAULT_REPORT_EXTENSION) -> tuple:
     """
   
     :param body: a dictionary with the json fields:
         :sparql_endpoint_url - The endpoint to validate
         :graphs - An optional list of named graphs to restrict the scope of the validation
     :param schema_file: The content of the SHACL shape files defining the validation constraints
+    :param report_extension: type of file to be returned. Can be `html`, `ttl`, or `zip`. Defaults to `ttl`
     :return: the validation ttl file
     :rtype: ttl file, int
     """
@@ -107,20 +85,24 @@ def validate_sparql_endpoint(body, schema_file: FileStorage) -> tuple:
                          ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
         raise UnsupportedMediaType(exception_text)
 
+    if report_extension not in REPORT_EXTENSIONS:
+        raise UnprocessableEntity(
+            'Wrong report_extension format. Accepted formats: '
+            f'{", ".join([format for format in REPORT_EXTENSIONS])}')
+
     try:
         with tempfile.TemporaryDirectory() as temp_folder:
             local_schema_file = Path(temp_folder) / str(schema_file.filename)
             schema_file.save(local_schema_file)
 
-            html_report, ttl_report = run_sparql_endpoint_validator(sparql_endpoint_url=sparql_endpoint_url,
-                                                                    graphs_uris=graphs,
-                                                                    schemas=[str(local_schema_file)],
-                                                                    output=str(Path(temp_folder)) + '/')
+            report_path, report_filename = build_report_from_sparql_endpoint(temp_folder,
+                                                                             sparql_endpoint_url,
+                                                                             graphs,
+                                                                             str(local_schema_file),
+                                                                             report_extension,
+                                                                             'filename')
 
-            prepare_eds4jinja_context(temp_folder, ttl_report)
-            report_path = generate_validation_report(temp_folder)
-
-            return send_file(report_path, as_attachment=True)  # 200
+            return send_file(report_path, as_attachment=True, attachment_filename=report_filename)  # 200
     except Exception as e:
         logger.exception(e)
         raise InternalServerError(str(e))  # 500

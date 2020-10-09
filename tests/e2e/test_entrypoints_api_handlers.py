@@ -18,24 +18,23 @@ from werkzeug.datastructures import FileStorage
 @pytest.mark.parametrize("filename",
                          ['test.rdf', 'test.trix', 'test.nq', 'test.nt', 'test.ttl', 'test.n3', 'test.jsonld'])
 @patch('validator.entrypoints.api.handlers.generate_validation_report')
-@patch('validator.entrypoints.api.handlers.prepare_eds4jinja_context')
 @patch('validator.entrypoints.api.handlers.run_file_validator')
-def test_validate_file_success(mock_run_file_validator, mock_prepare_eds4jinja_context, mock_generate_validation_report,
+def test_validate_file_success(mock_run_file_validator, mock_generate_validation_report,
                                filename, api_client, tmpdir):
-    report = tmpdir.join('report.html')
+    report = tmpdir.join('report.ttl')
     report.write('validation success')
-    mock_run_file_validator.return_value = None, None
-    mock_generate_validation_report.return_value = str(report)
 
     data = {
         'data_file': FileStorage(BytesIO(b'data file content'), filename),
         'schema_file': FileStorage(BytesIO(b''), 'schema_' + filename)
     }
+    mock_run_file_validator.return_value = None, filename
+    mock_generate_validation_report.return_value = str(report)
 
     response = api_client.post('/validate-file', data=data, content_type='multipart/form-data')
 
-    assert mock_prepare_eds4jinja_context.called
     assert response.status_code == 200
+    assert 'text/ttl' in response.content_type
     assert 'validation success' in response.data.decode()
 
 

@@ -57,6 +57,11 @@ paths:
     post:
       operationId: validator.entrypoints.api.handlers.validate_sparql_endpoint
       description: Validate a sparql endpoint with the provided SHACL shapes and optionally restricted to provided graphs.
+      parameters:
+        - name: report_extension
+          in: query
+          schema:
+            type: string
       requestBody:
         required: true
         content:
