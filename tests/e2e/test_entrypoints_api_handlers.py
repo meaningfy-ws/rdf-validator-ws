@@ -17,10 +17,9 @@ from werkzeug.datastructures import FileStorage
 
 @pytest.mark.parametrize("filename",
                          ['test.rdf', 'test.trix', 'test.nq', 'test.nt', 'test.ttl', 'test.n3', 'test.jsonld'])
-@patch('validator.entrypoints.api.handlers.generate_validation_report')
-@patch('validator.entrypoints.api.handlers.run_file_validator')
-def test_validate_file_success(mock_run_file_validator, mock_generate_validation_report,
-                               filename, api_client, tmpdir):
+@patch('validator.entrypoints.api.handlers.build_report_from_file')
+def test_validate_file_success_different_file_types(mock_build_report_from_file,
+                                                    filename, api_client, tmpdir):
     report = tmpdir.join('report.ttl')
     report.write('validation success')
 
@@ -28,13 +27,13 @@ def test_validate_file_success(mock_run_file_validator, mock_generate_validation
         'data_file': FileStorage(BytesIO(b'data file content'), filename),
         'schema_file': FileStorage(BytesIO(b''), 'schema_' + filename)
     }
-    mock_run_file_validator.return_value = None, filename
-    mock_generate_validation_report.return_value = str(report)
+
+    mock_build_report_from_file.return_value = str(report), 'report.ttl'
 
     response = api_client.post('/validate-file', data=data, content_type='multipart/form-data')
 
     assert response.status_code == 200
-    assert 'text/ttl' in response.content_type
+    assert 'text/turtle' in response.content_type
     assert 'validation success' in response.data.decode()
 
 
@@ -66,35 +65,122 @@ def test_validate_file_type_exception_two(api_client):
     assert unacceptable_filename_2 in response.json.get('detail')
 
 
+@pytest.mark.parametrize("report_extension, content_type",
+                         [('ttl', 'text/turtle'), ('html', 'text/html'), ('zip', 'application/zip')])
+@patch('validator.entrypoints.api.handlers.build_report_from_file')
+def test_validate_file_success_different_report_extensions(mock_build_report_from_file, report_extension, content_type,
+                                                           api_client, tmpdir):
+    report = tmpdir.join(f'report.{report_extension}')
+    report.write('validation success')
+
+    data = {
+        'data_file': FileStorage(BytesIO(b'data file content'), 'data.ttl'),
+        'schema_file': FileStorage(BytesIO(b'shacl file content'), 'shacl.ttl')
+    }
+
+    mock_build_report_from_file.return_value = str(report), f'report.{report_extension}'
+
+    response = api_client.post(f'/validate-file?report_extension{report_extension}', data=data,
+                               content_type='multipart/form-data')
+
+    assert response.status_code == 200
+    assert content_type in response.content_type
+    assert 'validation success' in response.data.decode()
+
+
+def test_validate_file_fail_report_extension(api_client):
+    data = {
+        'data_file': FileStorage(BytesIO(b'data file content'), 'data.ttl'),
+        'schema_file': FileStorage(BytesIO(b'shacl file content'), 'shacl.ttl')
+    }
+
+    invalid_extension = 'pdf'
+
+    response = api_client.post(f'/validate-file?report_extension={invalid_extension}', data=data,
+                               content_type='multipart/form-data')
+    assert response.status_code == 422
+    assert 'Wrong report_extension format. Accepted formats: ttl, html, zip' in response.json.get('detail')
+
+
 @pytest.mark.parametrize("filename",
                          ['shapes.rdf', 'shapes.trix', 'shapes.nq', 'shapes.nt',
                           'shapes.ttl', 'shapes.n3', 'shapes.jsonld'])
-@patch('validator.entrypoints.api.handlers.generate_validation_report')
-@patch('validator.entrypoints.api.handlers.prepare_eds4jinja_context')
-@patch('validator.entrypoints.api.handlers.run_sparql_endpoint_validator')
-def test_validate_sparql_endpoint_success(mock_run_sparql_endpoint_validator, mock_prepare_eds4jinja_context,
-                                          mock_generate_validation_report, filename, api_client, tmpdir):
-    report = tmpdir.join('report.html')
+@patch('validator.entrypoints.api.handlers.build_report_from_sparql_endpoint')
+def test_validate_sparql_endpoint_success(mock_build_report_from_sparql_endpoint, filename, api_client, tmpdir):
+    report = tmpdir.join('report.ttl')
     report.write('validation success')
-    mock_run_sparql_endpoint_validator.return_value = None, None
-    mock_generate_validation_report.return_value = str(report)
 
     data = {
         'schema_file': FileStorage(BytesIO(b'shape file content'), filename),
         'graphs': ['shape1', 'shape2'],
         'sparql_endpoint_url': 'http://sparql.endpoint'
     }
+
+    mock_build_report_from_sparql_endpoint.return_value = str(report), 'report.ttl'
+
     response = api_client.post('/validate-sparql-endpoint', data=data, content_type='multipart/form-data')
 
-    assert mock_prepare_eds4jinja_context.called
     assert response.status_code == 200
+    assert 'text/turtle' in response.content_type
+    assert 'validation success' in response.data.decode()
+
+
+def test_validate_sparql_endpoint_type_exception_one(api_client):
+    unacceptable_filename = 'schema_file.pdf'
+    data = {
+        'schema_file': FileStorage(BytesIO(b''), unacceptable_filename),
+        'graphs': ['shape1', 'shape2'],
+        'sparql_endpoint_url': 'http://sparql.endpoint'
+    }
+    response = api_client.post('/validate-sparql-endpoint', data=data, content_type='multipart/form-data')
+
+    assert response.status_code == 415
+    assert unacceptable_filename in response.json.get('detail')
+
+
+def test_validate_sparql_endpoint_fail_report_extension(api_client):
+    data = {
+        'schema_file': FileStorage(BytesIO(b'shacl file content'), 'shacl.ttl'),
+        'graphs': ['shape1', 'shape2'],
+        'sparql_endpoint_url': 'http://sparql.endpoint'
+    }
+
+    invalid_extension = 'pdf'
+
+    response = api_client.post(f'/validate-sparql-endpoint?report_extension={invalid_extension}', data=data,
+                               content_type='multipart/form-data')
+    assert response.status_code == 422
+    assert 'Wrong report_extension format. Accepted formats: ttl, html, zip' in response.json.get('detail')
+
+
+@pytest.mark.parametrize("report_extension, content_type",
+                         [('ttl', 'text/turtle'), ('html', 'text/html'), ('zip', 'application/zip')])
+@patch('validator.entrypoints.api.handlers.build_report_from_sparql_endpoint')
+def test_validate_file_success_different_report_extensions(build_report_from_sparql_endpoint, report_extension,
+                                                           content_type,
+                                                           api_client, tmpdir):
+    report = tmpdir.join(f'report.{report_extension}')
+    report.write('validation success')
+
+    data = {
+        'schema_file': FileStorage(BytesIO(b'shacl file content'), 'shacl.ttl'),
+        'graphs': ['shape1', 'shape2'],
+        'sparql_endpoint_url': 'http://sparql.endpoint'
+    }
+
+    build_report_from_sparql_endpoint.return_value = str(report), f'report.{report_extension}'
+
+    response = api_client.post(f'/validate-sparql-endpoint?report_extension{report_extension}', data=data,
+                               content_type='multipart/form-data')
+
+    assert response.status_code == 200
+    assert content_type in response.content_type
     assert 'validation success' in response.data.decode()
 
 
 def test_validate_sparql_endpoint_schema_file_type_exception(api_client):
     unacceptable_filename = 'schema_file.pdf'
     data = {
-        'dataset_uri': 'http://hello',
         'schema_file': FileStorage(BytesIO(b'data file content'), unacceptable_filename),
         'graphs': ['shape1', 'shape2'],
         'sparql_endpoint_url': 'http://sparql.endpoint'
