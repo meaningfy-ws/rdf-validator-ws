@@ -7,18 +7,20 @@ WORKDIR /RDFUnit-master
 RUN mvn -pl rdfunit-validate -am clean package -P cli-standalone -DskipTests=true
 
 # Build for python API
-FROM python:3.8.5-buster
+FROM python:3.8.5-buster as target
 
 RUN apt-get update -y \
 && apt-get upgrade -y \
 && apt-get install -y openjdk-11-jre
 
-WORKDIR /usr/src/app
-COPY --from=build /RDFUnit-master/rdfunit-validate/target/rdfunit-validate-*-standalone.jar /usr/src/app/rdfunit-validate.jar
+WORKDIR /usr/src/rdfunit
+COPY --from=build /RDFUnit-master/rdfunit-validate/target/rdfunit-validate-*-standalone.jar /usr/src/rdfunit/rdfunit-validate.jar
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+
+WORKDIR /usr/src/app
 COPY . /usr/src/app
 
 RUN pip install --upgrade pip

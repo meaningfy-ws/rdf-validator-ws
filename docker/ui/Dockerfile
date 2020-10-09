@@ -8,6 +8,6 @@ ENV PYTHONUNBUFFERED 1
 COPY . /usr/src/app
 
 RUN pip install --upgrade pip
-RUN pip install -r requirements/dev.txt
+RUN pip install -r requirements.txt
 
-CMD flask run --host=0.0.0.0 --port=${VALIDATOR_UI_PORT}
+CMD gunicorn --bind 0.0.0.0:${VALIDATOR_UI_PORT} validator.entrypoints.ui.run:app

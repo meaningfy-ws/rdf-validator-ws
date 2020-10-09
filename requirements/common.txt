@@ -1,6 +1,10 @@
 requests
 connexion[swagger-ui]
 
+Flask
+flask-bootstrap
+Flask-Wtf
+
 rdflib
 python-dotenv
-git+https://github.com/meaningfy-ws/eds4jinja2
+eds4jinja2
