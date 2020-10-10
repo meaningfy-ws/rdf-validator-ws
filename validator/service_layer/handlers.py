@@ -200,20 +200,20 @@ def create_report(location: str, html_report: str, ttl_report: str, extension: s
     return report_path, report_filename
 
 
-def build_report_from_file(location: str, data_file: str, schema_file: str, extension: str,
+def build_report_from_file(location: str, data_file: str, schema_files: list, extension: str,
                            file_name: str = 'file') -> tuple:
     html_report, ttl_report = run_file_validator(data_file=data_file,
-                                                 schemas=[schema_file],
+                                                 schemas=schema_files,
                                                  output=str(Path(location)) + '/')
 
     return create_report(location, html_report, ttl_report, extension, file_name)
 
 
-def build_report_from_sparql_endpoint(location: str, endpoint: str, graphs: list, schema_file: str, extension: str,
+def build_report_from_sparql_endpoint(location: str, endpoint: str, graphs: list, schema_files: list, extension: str,
                                       file_name: str = 'file') -> tuple:
     html_report, ttl_report = run_sparql_endpoint_validator(sparql_endpoint_url=endpoint,
                                                             graphs_uris=graphs,
-                                                            schemas=[schema_file],
+                                                            schemas=schema_files,
                                                             output=str(Path(location)) + '/')
 
     return create_report(location, html_report, ttl_report, extension, file_name)

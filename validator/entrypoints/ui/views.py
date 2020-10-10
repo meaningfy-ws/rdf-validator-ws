@@ -55,6 +55,7 @@ def validate_file():
 @app.route('/validate-sparql-endpoint', methods=['GET', 'POST'])
 def validate_sparql_endpoint():
     form = ValidateSPARQLEndpointForm()
+
     if form.validate_on_submit():
         response, status = api_validate_sparql_endpoint(
             report_extension=form.report_extension.data,
