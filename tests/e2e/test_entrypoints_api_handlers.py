@@ -138,21 +138,6 @@ def test_validate_sparql_endpoint_type_exception_one(api_client):
     assert unacceptable_filename in response.json.get('detail')
 
 
-def test_validate_sparql_endpoint_fail_report_extension(api_client):
-    data = {
-        'schema_file': FileStorage(BytesIO(b'shacl file content'), 'shacl.ttl'),
-        'graphs': ['shape1', 'shape2'],
-        'sparql_endpoint_url': 'http://sparql.endpoint'
-    }
-
-    invalid_extension = 'pdf'
-
-    response = api_client.post(f'/validate-sparql-endpoint?report_extension={invalid_extension}', data=data,
-                               content_type='multipart/form-data')
-    assert response.status_code == 422
-    assert 'Wrong report_extension format. Accepted formats: ttl, html, zip' in response.json.get('detail')
-
-
 @pytest.mark.parametrize("report_extension, content_type",
                          [('ttl', 'text/turtle'), ('html', 'text/html'), ('zip', 'application/zip')])
 @patch('validator.entrypoints.api.handlers.build_report_from_sparql_endpoint')
@@ -178,14 +163,16 @@ def test_validate_file_success_different_report_extensions(build_report_from_spa
     assert 'validation success' in response.data.decode()
 
 
-def test_validate_sparql_endpoint_schema_file_type_exception(api_client):
-    unacceptable_filename = 'schema_file.pdf'
+def test_validate_sparql_endpoint_fail_report_extension(api_client):
     data = {
-        'schema_file': FileStorage(BytesIO(b'data file content'), unacceptable_filename),
+        'schema_file': FileStorage(BytesIO(b'shacl file content'), 'shacl.ttl'),
         'graphs': ['shape1', 'shape2'],
         'sparql_endpoint_url': 'http://sparql.endpoint'
     }
-    response = api_client.post('/validate-sparql-endpoint', data=data, content_type='multipart/form-data')
 
-    assert response.status_code == 415
-    assert unacceptable_filename in response.data.decode()
+    invalid_extension = 'pdf'
+
+    response = api_client.post(f'/validate-sparql-endpoint?report_extension={invalid_extension}', data=data,
+                               content_type='multipart/form-data')
+    assert response.status_code == 422
+    assert 'Wrong report_extension format. Accepted formats: ttl, html, zip' in response.json.get('detail')
