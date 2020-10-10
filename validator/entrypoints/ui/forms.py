@@ -10,20 +10,18 @@
 
 """
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired, FileAllowed
-
-from wtforms import StringField, SubmitField, TextAreaField, RadioField
-from wtforms.validators import DataRequired, URL
+from flask_wtf.file import FileField, FileRequired
+from wtforms import StringField, SubmitField, TextAreaField, RadioField, MultipleFileField
+from wtforms.validators import DataRequired
 
 from validator.entrypoints.api.helpers import HTML_EXTENSION, TTL_EXTENSION, ZIP_EXTENSION
 
 
 class BaseValidateForm(FlaskForm):
-    report_extension = RadioField('Report Extension', choices=[(TTL_EXTENSION, 'Turtle report'), (HTML_EXTENSION, 'HTML report'),
-                                                               (ZIP_EXTENSION, 'Both reports')])
-    schema_file = FileField('Schema file*',
-                            validators=[FileRequired()])
-    submit = SubmitField('Validate')
+    report_extension = RadioField('Report Extension',
+                                  choices=[(TTL_EXTENSION, 'Turtle report'), (HTML_EXTENSION, 'HTML report'),
+                                           (ZIP_EXTENSION, 'Both reports')])
+    schema_files = MultipleFileField('Schema files*', description="Current maximum accepted files: 5.")
 
 
 class ValidateFromFileForm(BaseValidateForm):

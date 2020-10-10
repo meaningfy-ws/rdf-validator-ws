@@ -10,7 +10,12 @@
         {{ wtf.form_errors(form, hiddens="only") }}
 
         {{ wtf.form_field(form.data_file) }}
-        {{ wtf.form_field(form.schema_file) }}
+
+        <div class="form-group required">
+            <label class="control-label" for="schema_files">{{ form.schema_files.label }}</label>
+            <input id="schema_files" multiple="" name="schema_files" required="" type="file">
+            <p class="help-block">{{ form.schema_files.description }}</p>
+        </div>
 
         <label class="control-label" for="report_extension">Choose report type</label>
         {{ wtf.form_field(form.report_extension) }}

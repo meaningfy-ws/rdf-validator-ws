@@ -226,18 +226,3 @@ def test_validate_sparql_endpoint_success_different_report_extensions(build_repo
     assert response.status_code == 200
     assert content_type in response.content_type
     assert 'validation success' in response.data.decode()
-
-
-def test_validate_sparql_endpoint_fail_report_extension(api_client):
-    data = {
-        'schema_file0': FileStorage(BytesIO(b'data file content'), unacceptable_filename),
-        'graphs': ['shape1', 'shape2'],
-        'sparql_endpoint_url': 'http://sparql.endpoint'
-    }
-
-    invalid_extension = 'pdf'
-
-    response = api_client.post(f'/validate-sparql-endpoint?report_extension={invalid_extension}', data=data,
-                               content_type='multipart/form-data')
-    assert response.status_code == 422
-    assert 'Wrong report_extension format. Accepted formats: ttl, html, zip' in response.json.get('detail')
