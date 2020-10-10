@@ -20,27 +20,22 @@ RequestResponse = namedtuple('RequestResponse', ['content', 'status_code'])
 
 
 def _helper_get_request_and_parse(client, url) -> BeautifulSoup:
-    response = client.get(url)
+    response = client.get(url, follow_redirects=True)
     return BeautifulSoup(response.data, 'html.parser')
 
 
-def _test_index(ui_client):
+def test_index(ui_client):
     ui_url = '/'
     soup = _helper_get_request_and_parse(ui_client, ui_url)
 
-    title = soup.find('h1')
-    assert 'RDF Validator' in title.get_text()
-
-    validators = soup.find(id='validators').find_all('a')
-    assert len(validators) == 2
-    assert 'File Validation' in validators[0].get_text()
-    assert 'SPARQL Endpoint Validation' in validators[1].get_text()
+    title = soup.find(id='title')
+    assert 'Validate File' in title.get_text()
 
 
-@patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def _test_validate_file(mock_post, ui_client):
+@patch('validator.entrypoints.ui.views.api_validate_file')
+def test_validate_file(mock_api_validate_file, ui_client):
     ui_url = '/validate-file'
-    mock_post.return_value = RequestResponse(b'data file content', 200)
+    mock_api_validate_file.return_value = RequestResponse(b'report file content', 200)
 
     soup = _helper_get_request_and_parse(ui_client, ui_url)
 
@@ -50,29 +45,29 @@ def _test_validate_file(mock_post, ui_client):
     data = {
         'data_file': FileStorage(BytesIO(b'data file content'), 'data.rdf'),
         'schema_file': FileStorage(BytesIO(b'schema file content'), 'schema.rdf'),
+        'report_extension': 'ttl'
     }
 
     response = ui_client.post('/validate-file', data=data, follow_redirects=True,
                               content_type='multipart/form-data')
 
-    breakpoint()
     assert response.status_code == 200
-    assert b'data file content' == response.data
+    assert b'report file content' == response.data
 
 
-@patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def _test_validate_file_type_exception(mock_post, ui_client):
+@patch('validator.entrypoints.ui.views.api_validate_file')
+def test_validate_file_type_exception(mock_api_validate_file, ui_client):
     ui_url = '/validate-file'
     exception_content = 'This file type is not supported'
     exception_response = {
         'detail': exception_content
     }
-    mock_post.return_value = RequestResponse(dumps(exception_response), 415)
+    mock_api_validate_file.return_value = dumps(exception_response), 415
 
     data = {
-        'dataset_uri': 'http://data.set',
         'data_file': FileStorage(BytesIO(b'data file content'), 'data.pdf'),
         'schema_file': FileStorage(BytesIO(b'schema file content'), 'schema.pdf'),
+        'report_extension': 'ttl'
     }
 
     response = ui_client.post(ui_url, data=data, follow_redirects=True,
@@ -83,10 +78,10 @@ def _test_validate_file_type_exception(mock_post, ui_client):
     assert error_message.get_text() in exception_content
 
 
-@patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def _test_validate_sparql_endpoint(mock_post, ui_client):
+@patch('validator.entrypoints.ui.views.api_validate_sparql_endpoint')
+def test_validate_sparql_endpoint(mock_api_validate_sparql_endpoint, ui_client):
     ui_url = '/validate-sparql-endpoint'
-    mock_post.return_value = RequestResponse(b'schema file content', 200)
+    mock_api_validate_sparql_endpoint.return_value = RequestResponse(b'schema file content', 200)
 
     soup = _helper_get_request_and_parse(ui_client, ui_url)
 
@@ -96,30 +91,31 @@ def _test_validate_sparql_endpoint(mock_post, ui_client):
     data = {
         'endpoint_url': 'http://endpoint.url',
         'schema_file': FileStorage(BytesIO(b'schema file content'), 'schema.rdf'),
-        'graphs': 'graph1 graph2'
+        'graphs': 'graph1 graph2',
+        'report_extension': 'ttl'
     }
 
-    response = ui_client.post(ui_url, data=data, follow_redirects=True,
+    response = ui_client.post(ui_url, data=data,
                               content_type='multipart/form-data')
 
     assert response.status_code == 200
     assert b'schema file content' == response.data
 
 
-@patch('validator.entrypoints.ui.api_wrapper.requests.post')
-def _test_validate_sparql_endpoint_type_exception(mock_post, ui_client):
+@patch('validator.entrypoints.ui.views.api_validate_sparql_endpoint')
+def test_validate_sparql_endpoint_type_exception(mock_api_validate_sparql_endpoint, ui_client):
     ui_url = '/validate-sparql-endpoint'
     exception_content = 'This file type is not supported'
     exception_response = {
         'detail': exception_content
     }
-    mock_post.return_value = RequestResponse(dumps(exception_response), 415)
+    mock_api_validate_sparql_endpoint.return_value = dumps(exception_response), 415
 
     data = {
-        'dataset_uri': 'http://data.set',
         'endpoint_url': 'http://endpoint.url',
         'schema_file': FileStorage(BytesIO(b'schema file content'), 'schema.rdf'),
-        'graphs': 'graph1 graph2'
+        'graphs': 'graph1 graph2',
+        'report_extension': 'ttl'
     }
 
     response = ui_client.post(ui_url, data=data, follow_redirects=True,

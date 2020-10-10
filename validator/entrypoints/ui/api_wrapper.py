@@ -27,7 +27,7 @@ def validate_file(data_file: FileStorage, schema_file: FileStorage, report_exten
         'data_file': (data_file.filename, data_file.stream, data_file.mimetype),
         'schema_file': (schema_file.filename, schema_file.stream, schema_file.mimetype)
     }
-    print('from api wrapper', report_extension)
+
     response = requests.post(config.VALIDATOR_API_ENDPOINT + '/validate-file', files=files,
                              params={'report_extension': report_extension})
     return response.content, response.status_code

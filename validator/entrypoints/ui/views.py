@@ -32,7 +32,6 @@ def validate_file():
     form = ValidateFromFileForm()
 
     if form.validate_on_submit():
-        print('from view', form.report_extension.data)
         response, status = api_validate_file(
             report_extension=form.report_extension.data,
             data_file=form.data_file.data,
