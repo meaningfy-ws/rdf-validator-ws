@@ -35,35 +35,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                data_file:
-                  type: string
-                  format: binary
-                  description: The data content to validate
-                schema_file0:
-                  type: string
-                  format: binary
-                  description: The content of the SHACL shape file defining the validation constraints
-                schema_file1:
-                  type: string
-                  format: binary
-                  description: The content of the SHACL shape file defining the validation constraints
-                schema_file2:
-                  type: string
-                  format: binary
-                  description: The content of the SHACL shape file defining the validation constraints
-                schema_file3:
-                  type: string
-                  format: binary
-                  description: The content of the SHACL shape file defining the validation constraints
-                schema_file4:
-                  type: string
-                  format: binary
-                  description: The content of the SHACL shape file defining the validation constraints
-              required:
-                - data_file
-                - schema_file0
+              $ref: '#/components/schemas/FileValidator'
       responses:
         200:
           description: Request to validate endpoint successfully accepted for processing.
@@ -85,14 +57,6 @@ paths:
             schema:
               type: object
               properties:
-                sparql_endpoint_url:
-                  type: string
-                  description: The endpoint to validate
-                graphs:
-                  type: array
-                  description: An optional list of named graphs to restrict the scope of the validation
-                  items:
-                    type: string
                 schema_file0:
                   type: string
                   format: binary
@@ -113,11 +77,60 @@ paths:
                   type: string
                   format: binary
                   description: The content of the SHACL shape file defining the validation constraints
+                graphs:
+                  type: array
+                  description: An optional list of named graphs to restrict the scope of the validation
+                  items:
+                    type: string
+                sparql_endpoint_url:
+                  type: string
+                  description: The endpoint to validate
               required:
-                - sparql_endpoint_url
                 - schema_file0
+                - sparql_endpoint_url
       responses:
         200:
           description: Request to validate endpoint successfully accepted for processing.
         5XX:
           description: Unexpected Error.
+
+components:
+  schemas:
+    GenericValidator:
+      type: object
+      description: Base "class" for defining validator api structure
+      properties:
+        schema_file0:
+          type: string
+          format: binary
+          description: The content of the SHACL shape file defining the validation constraints
+        schema_file1:
+          type: string
+          format: binary
+          description: The content of the SHACL shape file defining the validation constraints
+        schema_file2:
+          type: string
+          format: binary
+          description: The content of the SHACL shape file defining the validation constraints
+        schema_file3:
+          type: string
+          format: binary
+          description: The content of the SHACL shape file defining the validation constraints
+        schema_file4:
+          type: string
+          format: binary
+          description: The content of the SHACL shape file defining the validation constraints
+    FileValidator:
+      type: object
+      description: File validator
+      allOf:
+        - $ref: '#/components/schemas/GenericValidator'
+        - type: object
+          properties:
+            data_file:
+              type: string
+              format: binary
+              description: The data content to validate
+          required:
+            - schema_file0
+            - data_file
