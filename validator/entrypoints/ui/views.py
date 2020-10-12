@@ -35,7 +35,7 @@ def validate_file():
         response, status = api_validate_file(
             report_extension=form.report_extension.data,
             data_file=form.data_file.data,
-            schema_file=form.schema_file.data
+            schema_files=form.schema_files.data
         )
 
         if status != 200:
@@ -54,11 +54,12 @@ def validate_file():
 @app.route('/validate-sparql-endpoint', methods=['GET', 'POST'])
 def validate_sparql_endpoint():
     form = ValidateSPARQLEndpointForm()
+
     if form.validate_on_submit():
         response, status = api_validate_sparql_endpoint(
             report_extension=form.report_extension.data,
             sparql_endpoint_url=form.endpoint_url.data,
-            schema_file=form.schema_file.data,
+            schema_files=form.schema_files.data,
             graphs=form.graphs.data.split()
         )
 
