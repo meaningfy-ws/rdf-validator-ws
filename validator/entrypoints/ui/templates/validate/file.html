@@ -5,7 +5,7 @@
 {% block app_content %}
     <h1 id="title">{{ title }}</h1>
 
-    <form method="post" role="form" enctype="multipart/form-data">
+    <form method="post" role="form" enctype="multipart/form-data" onsubmit="return checkForm(this)">
         {{ form.hidden_tag() }}
         {{ wtf.form_errors(form, hiddens="only") }}
 
@@ -21,11 +21,33 @@
         {{ wtf.form_field(form.report_extension) }}
         <div class="row">
             <div class="col-md-6">
-                <button type="submit" id="submit" class="btn btn-primary">{{ title }}</button>
+                <div class="row">
+                    <div id="loading"></div>
+                    <div>
+                        <button type="submit" id="submit" onclick="loading()"
+                                class="btn btn-primary">{{ title }}</button>
+                    </div>
+                </div>
             </div>
             <div class="col-md-6">
                 <a href="{{ url_for('validate_file') }}" id="reload" class="btn btn-warning pull-right">Reset form</a>
             </div>
         </div>
     </form>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        function checkForm(form) {
+            form.submit.disabled = true;
+            return true;
+        }
+    </script>
+    <script type="text/javascript">
+        function loading() {
+            $("#loading").show();
+            {#$("#content").hide();#}
+        }
+    </script>
 {% endblock %}

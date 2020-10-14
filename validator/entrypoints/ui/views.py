@@ -13,7 +13,7 @@ import tempfile
 from json import loads
 from pathlib import Path
 
-from flask import render_template, flash, send_from_directory, redirect, url_for
+from flask import render_template, flash, send_from_directory, redirect, url_for, send_file
 
 from validator.entrypoints.api.helpers import TTL_EXTENSION
 from validator.entrypoints.ui import app
