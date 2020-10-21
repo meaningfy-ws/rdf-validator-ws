@@ -74,8 +74,8 @@ def test_validate_file_type_exception(mock_api_validate_file, ui_client):
                               content_type='multipart/form-data')
     soup = BeautifulSoup(response.data, 'html.parser')
 
-    error_message = soup.find('div', {'class': 'alert alert-danger'})
-    assert error_message.get_text() in exception_content
+    error_message = soup.find('div', {'class': 'card red lighten-3'})
+    assert exception_content in error_message.get_text()
 
 
 @patch('validator.entrypoints.ui.views.api_validate_sparql_endpoint')
@@ -122,5 +122,5 @@ def test_validate_sparql_endpoint_type_exception(mock_api_validate_sparql_endpoi
                               content_type='multipart/form-data')
     soup = BeautifulSoup(response.data, 'html.parser')
 
-    error_message = soup.find('div', {'class': 'alert alert-danger'})
-    assert error_message.get_text() in exception_content
+    error_message = soup.find('div', {'class': 'card red lighten-3'})
+    assert exception_content in error_message.get_text()

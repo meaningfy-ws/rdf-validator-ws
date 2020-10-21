@@ -18,17 +18,17 @@ from validator.entrypoints.api.helpers import HTML_EXTENSION, TTL_EXTENSION, ZIP
 
 
 class BaseValidateForm(FlaskForm):
-    report_extension = RadioField('Report Extension',
+    report_extension = RadioField('Choose the report extension',
                                   choices=[(TTL_EXTENSION, 'Turtle report'), (HTML_EXTENSION, 'HTML report'),
                                            (ZIP_EXTENSION, 'Both reports')])
-    schema_files = MultipleFileField('Schema files*', description="Current maximum accepted files: 5.")
+    schema_files = MultipleFileField('Data shape files', description="Current maximum accepted files: 5.")
 
 
 class ValidateFromFileForm(BaseValidateForm):
-    data_file = FileField('Data file*',
+    data_file = FileField('Data file',
                           validators=[FileRequired()])
 
 
 class ValidateSPARQLEndpointForm(BaseValidateForm):
-    endpoint_url = StringField('Endpoint URL*', validators=[DataRequired()])
+    endpoint_url = StringField('Endpoint URL', validators=[DataRequired()])
     graphs = TextAreaField('Graphs', description='Separate them through spaces. example: graph1 graph2')
