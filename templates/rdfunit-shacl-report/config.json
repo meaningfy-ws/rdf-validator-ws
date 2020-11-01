@@ -6,6 +6,6 @@
         "type": "report",
         "author": "Meaningfy",
         "ns_file": "data/prefix.csv",
-        "report_data_file": "../../tests/test_data/validation-reports/treaties-ap/report-rdfunit-treaties-skos-ap.ttl"
+        "report_data_file": "../../tests/test-data/test-shaclTestCaseResult.ttl"
     }
 }
