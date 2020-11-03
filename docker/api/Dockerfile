@@ -26,4 +26,4 @@ COPY . /usr/src/app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-CMD gunicorn -w 2 --bind 0.0.0.0:${VALIDATOR_API_PORT} --reload validator.entrypoints.api.run:app
+CMD gunicorn --timeout $RDF_VALIDATOR_GUNICORN_TIMEOUT --workers 10  --bind 0.0.0.0:${VALIDATOR_API_PORT} --reload validator.entrypoints.api.run:app
