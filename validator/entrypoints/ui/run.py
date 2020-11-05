@@ -6,12 +6,22 @@
 # Email: coslet.mihai@gmail.com
 
 """
-Production UI server through flask definitions.
+UI server through flask definitions.
 """
-from validator.entrypoints.flask_config import ProductionConfig
-from . import app
+import logging
 
-app.config.from_object(ProductionConfig())
+from validator.config import ProductionConfig, RDF_VALIDATOR_DEBUG, DevelopmentConfig
+from validator.entrypoints.ui import app
+
+if RDF_VALIDATOR_DEBUG:
+    app.config.from_object(DevelopmentConfig())
+else:
+    app.config.from_object(ProductionConfig())
 
 if __name__ == '__main__':
     app.run()
+
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)

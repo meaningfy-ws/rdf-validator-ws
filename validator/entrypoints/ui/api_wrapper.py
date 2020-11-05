@@ -13,7 +13,7 @@ from typing import List
 import requests
 from werkzeug.datastructures import FileStorage
 
-from validator.entrypoints.ui import config
+from validator import config
 
 
 def validate_file(data_file: FileStorage, schema_files: List[FileStorage], report_extension: str) -> tuple:
@@ -31,7 +31,7 @@ def validate_file(data_file: FileStorage, schema_files: List[FileStorage], repor
     for index, schema_file in enumerate(schema_files):
         files[f'schema_file{index}'] = (schema_file.filename, schema_file.stream, schema_file.mimetype)
 
-    response = requests.post(config.VALIDATOR_API_ENDPOINT + '/validate-file', files=files,
+    response = requests.post(config.RDF_VALIDATOR_API_SERVICE + '/validate-file', files=files,
                              params={'report_extension': report_extension})
     return response.content, response.status_code
 
@@ -57,6 +57,6 @@ def validate_sparql_endpoint(sparql_endpoint_url: str, schema_files: List[FileSt
     for index, schema_file in enumerate(schema_files):
         files[f'schema_file{index}'] = (schema_file.filename, schema_file.stream, schema_file.mimetype)
 
-    response = requests.post(config.VALIDATOR_API_ENDPOINT + '/validate-sparql-endpoint', data=data, files=files,
+    response = requests.post(config.RDF_VALIDATOR_API_SERVICE + '/validate-sparql-endpoint', data=data, files=files,
                              params={'report_extension': report_extension})
     return response.content, response.status_code

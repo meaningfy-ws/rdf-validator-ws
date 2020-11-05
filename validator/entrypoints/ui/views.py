@@ -10,7 +10,6 @@ UI pages
 
 """
 import tempfile
-from json import loads
 from pathlib import Path
 
 from flask import render_template, flash, send_from_directory, redirect, url_for
@@ -20,6 +19,7 @@ from validator.entrypoints.ui import app
 from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_file, \
     validate_sparql_endpoint as api_validate_sparql_endpoint
 from validator.entrypoints.ui.forms import ValidateFromFileForm, ValidateSPARQLEndpointForm
+from validator.entrypoints.ui.helpers import get_error_message_from_response
 
 
 @app.route('/', methods=['GET'])
@@ -39,7 +39,7 @@ def validate_file():
         )
 
         if status != 200:
-            flash(loads(response).get('detail'), 'error')
+            flash(get_error_message_from_response(response), 'error')
         else:
             report_extension = form.report_extension.data if form.report_extension.data else TTL_EXTENSION
 
@@ -64,7 +64,7 @@ def validate_sparql_endpoint():
         )
 
         if status != 200:
-            flash(loads(response).get('detail'), 'error')
+            flash(get_error_message_from_response(response), 'error')
         else:
             report_extension = form.report_extension.data if form.report_extension.data else TTL_EXTENSION
 
