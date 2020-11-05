@@ -22,38 +22,37 @@ test:
 	@ echo "$(BUILD_PRINT)Running the tests"
 	@ pytest
 
-dev:
-	@ echo -e '$(BUILD_PRINT)Building the api container'
-	@ docker-compose --file dev.yml --env-file docker/.env build validator-api
-	@ echo -e '$(BUILD_PRINT)Building the ui container'
-	@ docker-compose --file dev.yml --env-file docker/.env build validator-ui
+build-services:
+	@ echo -e '$(BUILD_PRINT)Building the containers'
+	@ docker-compose --file docker/docker-compose.yml --env-file docker/.env build
 
-prod:
-	@ echo -e '$(BUILD_PRINT)Building the api container'
-	@ docker-compose --file prod.yml --env-file docker/.env build validator-api
-	@ echo -e '$(BUILD_PRINT)Building the ui container'
-	@ docker-compose --file prod.yml --env-file docker/.env build validator-ui
 
-start-dev:
-	@ echo -e '$(BUILD_PRINT)Starting the api container'
-	@ docker-compose --file dev.yml --env-file docker/.env up -d validator-api
-	@ echo -e '$(BUILD_PRINT)Starting the ui container'
-	@ docker-compose --file dev.yml --env-file docker/.env up -d validator-ui
+start-services:
+	@ echo -e '$(BUILD_PRINT)(dev) Starting the containers'
+	@ docker-compose --file docker/docker-compose.yml --env-file docker/.env up -d
 
-stop-dev:
-	@ echo -e '$(BUILD_PRINT)Stopping the ui container'
-	@ docker-compose --file dev.yml --env-file docker/.env stop validator-ui
-	@ echo -e '$(BUILD_PRINT)Stopping the api container'
-	@ docker-compose --file dev.yml --env-file docker/.env stop validator-api
+stop-services:
+	@ echo -e '$(BUILD_PRINT)(dev) Stopping the containers'
+	@ docker-compose --file docker/docker-compose.yml --env-file docker/.env stop
 
-start-prod:
-	@ echo -e '$(BUILD_PRINT)Starting PRODUCTION the api container'
-	@ docker-compose --file prod.yml --env-file docker/.env up -d validator-api
-	@ echo -e '$(BUILD_PRINT)Starting the ui container'
-	@ docker-compose --file prod.yml --env-file docker/.env up -d validator-ui
+#-----------------------------------------------------------------------------
+# Gherkin feature and acceptance test generation commands
+#-----------------------------------------------------------------------------
 
-stop-prod:
-	@ echo -e '$(BUILD_PRINT)Stopping  PRODUCTION the ui container'
-	@ docker-compose --file prod.yml --env-file docker/.env stop validator-ui
-	@ echo -e '$(BUILD_PRINT)Stopping the api container'
-	@ docker-compose --file prod.yml --env-file docker/.env stop validator-api
+FEATURES_FOLDER = tests/features
+STEPS_FOLDER = tests/steps
+FEATURE_FILES := $(wildcard $(FEATURES_FOLDER)/*.feature)
+EXISTENT_TEST_FILES = $(wildcard $(STEPS_FOLDER)/*.py)
+HYPOTHETICAL_TEST_FILES :=  $(addprefix $(STEPS_FOLDER)/test_, $(notdir $(FEATURE_FILES:.feature=.py)))
+TEST_FILES := $(filter-out $(EXISTENT_TEST_FILES),$(HYPOTHETICAL_TEST_FILES))
+
+generate-tests-from-features: $(TEST_FILES)
+	@ echo "$(BUILD_PRINT)The following test files should be generated: $(TEST_FILES)"
+	@ echo "$(BUILD_PRINT)Done generating missing feature files"
+	@ echo "$(BUILD_PRINT)Verifying if there are any missing step implementations"
+	@ py.test --generate-missing --feature $(FEATURES_FOLDER)
+
+$(addprefix $(STEPS_FOLDER)/test_, $(notdir $(STEPS_FOLDER)/%.py)): $(FEATURES_FOLDER)/%.feature
+	@ echo "$(BUILD_PRINT)Generating the testfile "$@"  from "$<" feature file"
+	@ pytest-bdd generate $< > $@
+	@ sed -i  's|features|../features|' $@

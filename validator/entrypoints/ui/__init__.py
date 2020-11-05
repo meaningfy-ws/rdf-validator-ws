@@ -11,11 +11,11 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
-from validator.entrypoints.ui.config import FLASK_SECRET_KEY
+from validator.config import RDF_VALIDATOR_UI_SECRET_KEY
 
 app = Flask(__name__)
 Bootstrap(app)
 
-app.config['SECRET_KEY'] = FLASK_SECRET_KEY
+app.config['SECRET_KEY'] = RDF_VALIDATOR_UI_SECRET_KEY
 
 from . import views

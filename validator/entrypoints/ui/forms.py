@@ -25,8 +25,7 @@ class BaseValidateForm(FlaskForm):
 
 
 class ValidateFromFileForm(BaseValidateForm):
-    data_file = FileField('Data file',
-                          validators=[FileRequired()])
+    data_file = FileField('Data file', validators=[FileRequired()])
 
 
 class ValidateSPARQLEndpointForm(BaseValidateForm):

@@ -1,8 +1,18 @@
 version: "3.7"
 
 services:
+  maintainance:
+    container_name: maintainance
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./docker/nginx:/usr/share/nginx/html
+    networks:
+      - mydefault
+
   itb:
-    build: docker/itb
+    build: itb
     container_name: generic-validator
     ports:
       - 9090:8080
@@ -13,13 +23,13 @@ services:
     container_name: validator-api
     image: meaningfy/rdf-validator-ws-api:latest
     build:
-      context: .
-      dockerfile: docker/api/Dockerfile
+      context: ..
+      dockerfile: ./docker/api/Dockerfile
     volumes:
-      - .:/usr/src/app
+      - ..:/usr/src/app
     ports:
-      - ${VALIDATOR_API_PORT}:${VALIDATOR_API_PORT}
-    env_file: docker/.env
+      - ${RDF_VALIDATOR_API_PORT}:${RDF_VALIDATOR_API_PORT}
+    env_file: .env
     networks:
       - mydefault
 
@@ -27,13 +37,13 @@ services:
     container_name: validator-ui
     image: meaningfy/rdf-validator-ws-ui:latest
     build:
-      context: .
-      dockerfile: docker/ui/Dockerfile
+      context: ..
+      dockerfile: ./docker/ui/Dockerfile
     volumes:
-      - .:/usr/src/app
+      - ..:/usr/src/app
     ports:
-      - ${VALIDATOR_UI_PORT}:${VALIDATOR_UI_PORT}
-    env_file: docker/.env
+      - ${RDF_VALIDATOR_UI_PORT}:${RDF_VALIDATOR_UI_PORT}
+    env_file: .env
     depends_on:
       - "validator-api"
     networks:
