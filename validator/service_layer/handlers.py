@@ -17,7 +17,7 @@ from zipfile import ZipFile
 from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
-from validator.config import RDFUNIT_QUERY_DELAY_MS
+from validator.config import RDFUNIT_QUERY_DELAY_MS, RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION
 from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION
 
 logger = logging.getLogger(__name__)
@@ -157,7 +157,8 @@ def generate_validation_report(path_to_report: Union[str, Path]) -> str:
 
 
 def prepare_eds4jinja_context(report_path, source_file):
-    copy_tree("templates/rdfunit-shacl-report/", report_path)
+    logger.info(f"Building with template location: {RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION}")
+    copy_tree(RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION, report_path)
 
     with open(Path(report_path) / "config.json", 'r+') as config_file:
         config = json.load(config_file)

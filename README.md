@@ -3,7 +3,6 @@
 RDF validator is an online platform for validating RDF data with SHACL shape definitions. It is based on the [RDFUnit](https://github.com/AKSW/RDFUnit) developed at the University of Leipzig. 
 
 
-
 # Installation
 Make sure that you are running `Docker` and have the correct permissions set.
 
@@ -16,9 +15,10 @@ newgrp docker
 ```
 ---
 
-To create both the API and the UI containers:
+To build and the containers run:
 ```bash
-make dev
+make build-volumes
+make build-services
 ```
 
 Install test/dev dependencies:
@@ -30,11 +30,37 @@ To run the tests:
 make test
 ```
 
+## Configure diff report template 
+The default validator report template resides in [resources/templates/validator_report](resources/templates/validator_report). 
+
+To configure your own template you can copy the default report template and adjust it to your needs. Read more about the required structure of the template on the [eds4jinja2](https://github.com/meaningfy-ws/eds4jinja2) documentation page.
+ 
+### Use the custom template
+After you have your custom template, run the `make` command, indicating the location of your template through the `location` variable.
+```bash
+make location=<location to template> set-report-template
+```
+---
+**NOTE**
+
+Make sure that the location specified ends with a trailing slash `/`, otherwise the command will not work.
+
+Example:
+```bash
+make location=~/template/location/ set-report-template
+```
+---
+After this, restart the `rdf-differ-api` container for the effects to take place.
+
+
 # Usage
+
+## Start services
+To run the docker containers for the `rdf-valdator` `api` and `ui`:
 
 To run the docker containers:
 ```bash
-make start-dev
+make start-services
 ```
 
 The validator services are split into:
