@@ -22,10 +22,16 @@ test:
 	@ echo "$(BUILD_PRINT)Running the tests"
 	@ pytest
 
+#-----------------------------------------------------------------------------
+# Service commands
+#-----------------------------------------------------------------------------
+
+build-volumes:
+	@ docker volume create rdf-validator-template
+
 build-services:
 	@ echo -e '$(BUILD_PRINT)Building the containers'
 	@ docker-compose --file docker/docker-compose.yml --env-file docker/.env build
-
 
 start-services:
 	@ echo -e '$(BUILD_PRINT)(dev) Starting the containers'
@@ -34,6 +40,19 @@ start-services:
 stop-services:
 	@ echo -e '$(BUILD_PRINT)(dev) Stopping the containers'
 	@ docker-compose --file docker/docker-compose.yml --env-file docker/.env stop
+
+#-----------------------------------------------------------------------------
+# Template commands
+#-----------------------------------------------------------------------------
+
+set-report-template:
+	@ echo "$(BUILD_PRINT)Copying custom template"
+	@ docker rm temp | true
+	@ docker volume rm rdf-validator-template | true
+	@ docker volume create rdf-validator-template
+	@ docker container create --name temp -v rdf-validator-template:/data busybox
+	@ docker cp $(location). temp:/data
+	@ docker rm temp
 
 #-----------------------------------------------------------------------------
 # Gherkin feature and acceptance test generation commands

@@ -27,6 +27,7 @@ services:
       dockerfile: ./docker/api/Dockerfile
     volumes:
       - ..:/usr/src/app
+      - rdf-validator-template:${RDF_VALIDATOR_TEMPLATE_LOCATION}
     ports:
       - ${RDF_VALIDATOR_API_PORT}:${RDF_VALIDATOR_API_PORT}
     env_file: .env
@@ -49,6 +50,9 @@ services:
     networks:
       - mydefault
 
+volumes:
+  rdf-validator-template:
+    external: true
 
 networks:
   mydefault:
