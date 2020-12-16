@@ -2,6 +2,9 @@
 
 RDF validator is an online platform for validating RDF data with SHACL shape definitions. It is based on the [RDFUnit](https://github.com/AKSW/RDFUnit) developed at the University of Leipzig. 
 
+Contents
+--------
+* [API Reference](srcdocs/modules)
 
 # Installation
 Make sure that you are running `Docker` and have the correct permissions set.
@@ -72,26 +75,26 @@ service | URL | info
 
 ## Validator API
 >Go to this link [localhost:4010/ui](http://localhost:4010/ui) to access the online definition of the API.
-![swagger page](docs/images/swagger.png)
+![swagger page](./images/swagger.png)
 
 > Sample execution of the `validator-api` from an API client 
 > Validate File: [http://0.0.0.0:4010/validate-file](http://0.0.0.0:4010/validate-file)
 
-![validate file api example](docs/images/examples/validate-file.png)
+![validate file api example](./images/examples/validate-file.png)
 
 > Validate SPARQL Endpoint: [http://0.0.0.0:4010/validate-sparql-endpoint](http://0.0.0.0:4010/validate-sparql-endpoint)
 
-![validate sparql endpoint api example](docs/images/examples/validate-sparql-endpoint.png)
+![validate sparql endpoint api example](./images/examples/validate-sparql-endpoint.png)
 
 
 ## Validator UI
 > File Validation page
 >
-![validate file page](docs/images/validate-file-page.png)
+![validate file page](./images/validate-file-page.png)
 
 > SPARQL Validation page
 
-![validate sparql page](docs/images/validate-sparql-endpoint.png)
+![validate sparql page](./images/validate-sparql-endpoint.png)
 
 
 ## Stop services

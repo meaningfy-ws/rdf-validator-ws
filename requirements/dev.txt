@@ -6,3 +6,9 @@ coverage
 pytest-cov
 pytest-bdd
 beautifulsoup4
+
+# Documentation Dependencies
+sphinx
+recommonmark
+sphinxcontrib-apidoc
+
