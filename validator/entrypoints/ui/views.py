@@ -9,11 +9,13 @@
 UI pages
 
 """
+import logging
 import tempfile
 from pathlib import Path
 
 from flask import render_template, flash, send_from_directory, redirect, url_for
 
+from validator.config import RDF_VALIDATOR_LOGGER
 from validator.entrypoints.api.helpers import TTL_EXTENSION
 from validator.entrypoints.ui import app
 from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_file, \
@@ -21,14 +23,19 @@ from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_f
 from validator.entrypoints.ui.forms import ValidateFromFileForm, ValidateSPARQLEndpointForm
 from validator.entrypoints.ui.helpers import get_error_message_from_response
 
+logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
+
 
 @app.route('/', methods=['GET'])
 def index():
+    logger.debug('request index view')
     return redirect(url_for('validate_file'))
 
 
 @app.route('/validate-file', methods=['GET', 'POST'])
 def validate_file():
+    logger.debug('request validate file view')
+
     form = ValidateFromFileForm()
 
     if form.validate_on_submit():
@@ -39,20 +46,26 @@ def validate_file():
         )
 
         if status != 200:
-            flash(get_error_message_from_response(response), 'error')
+            exception_text = get_error_message_from_response(response)
+            logger.exception(exception_text)
+            flash(exception_text, 'error')
         else:
             report_extension = form.report_extension.data if form.report_extension.data else TTL_EXTENSION
 
             with tempfile.TemporaryDirectory() as temp_folder:
                 report = Path(temp_folder) / str(f'report.{report_extension}')
                 report.write_bytes(response)
+                logger.debug('render validate file view')
                 return send_from_directory(Path(temp_folder), f'report.{report_extension}', as_attachment=True)
 
+    logger.debug('render validate file clean view')
     return render_template('validate/file.html', form=form, title='Validate File')
 
 
 @app.route('/validate-sparql-endpoint', methods=['GET', 'POST'])
 def validate_sparql_endpoint():
+    logger.debug('request validate sparql endpoint view')
+
     form = ValidateSPARQLEndpointForm()
 
     if form.validate_on_submit():
@@ -64,13 +77,17 @@ def validate_sparql_endpoint():
         )
 
         if status != 200:
-            flash(get_error_message_from_response(response), 'error')
+            exception_text = get_error_message_from_response(response)
+            logger.exception(exception_text)
+            flash(exception_text, 'error')
         else:
             report_extension = form.report_extension.data if form.report_extension.data else TTL_EXTENSION
 
             with tempfile.TemporaryDirectory() as temp_folder:
                 report = Path(temp_folder) / str(f'report.{report_extension}')
                 report.write_bytes(response)
+                logger.debug('render validate sparql endpoint view')
                 return send_from_directory(Path(temp_folder), f'report.{report_extension}', as_attachment=True)
 
+    logger.debug('request validate sparql endpoint clean view')
     return render_template('validate/sparql_endpoint.html', form=form, title='Validate SPARQL Endpoint')

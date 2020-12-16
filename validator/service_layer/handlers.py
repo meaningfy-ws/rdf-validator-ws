@@ -18,10 +18,10 @@ from zipfile import ZipFile
 from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
-from validator.config import RDFUNIT_QUERY_DELAY_MS, RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION
+from validator.config import RDFUNIT_QUERY_DELAY_MS, RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION, RDF_VALIDATOR_LOGGER
 from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
 
 
 def __copy_static_content(configuration_context: dict) -> None:
@@ -47,7 +47,7 @@ def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Pa
 
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
-    logger.info("RDFUnitWrapper starting ...")
+    logger.debug("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
     cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/rdfunit/rdfunit-validate.jar",
@@ -57,7 +57,7 @@ def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Pa
                                                       "-r", 'shacl',
                                                       "-o", 'html,ttl',
                                                       "-f", str(output))
-    logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+    logger.debug("RDFUnitWrapper finished with output:\n" + cli_output)
 
     output_file_name = str(Path(data_file).parent).replace('/', '_') + '_' + Path(
         data_file).name + ".shaclTestCaseResult"
@@ -78,7 +78,7 @@ def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Pa
 #     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
 #     """
 #
-#     logger.info("RDFUnitWrapper' starting ...")
+#     logger.debug("RDFUnitWrapper' starting ...")
 #     validator_wrapper: AbstractValidatorWrapper
 #     validator_wrapper = RDFUnitWrapper("java")
 #
@@ -92,7 +92,7 @@ def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Pa
 #                                                       "-o", 'html,ttl',
 #                                                       "-f" + str(output)
 #                                                       )
-#     logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+#     logger.debug("RDFUnitWrapper finished with output:\n" + cli_output)
 #
 #     parsed_uri = urlparse(dataset_uri)
 #     output_file_name = parsed_uri.netloc.replace(":", "_") + \
@@ -116,7 +116,7 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
     """
 
-    logger.info("RDFUnitWrapper starting ...")
+    logger.debug("RDFUnitWrapper starting ...")
     validator_wrapper: AbstractValidatorWrapper
     validator_wrapper = RDFUnitWrapper("java")
 
@@ -136,7 +136,7 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
                                                       "-o", 'html,ttl',
                                                       "-f", str(output),
                                                       "-g", graph_param)
-    logger.info("RDFUnitWrapper finished with output:\n" + cli_output)
+    logger.debug("RDFUnitWrapper finished with output:\n" + cli_output)
 
     parsed_uri = urlparse(sparql_endpoint_url)
     output_file_name = parsed_uri.netloc.replace(":", "_") + \
@@ -163,13 +163,13 @@ def generate_validation_report(path_to_report: Union[str, Path]) -> str:
 
 
 def prepare_eds4jinja_context(report_path, source_file):
-    logger.info(f"Building with template location: {RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION}")
+    logger.debug(f"Building with template location: {RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION}")
     copy_tree(RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION, report_path)
 
     with open(Path(report_path) / "config.json", 'r+') as config_file:
         config = json.load(config_file)
         config["conf"]["report_data_file"] = source_file
-        logger.info(config)
+        logger.debug(config)
         config_file.seek(0)
         json.dump(config, config_file)
         config_file.truncate()
@@ -180,16 +180,19 @@ def create_file_name(filename: str, file_type: str = TTL_EXTENSION) -> str:
 
 
 def create_report(location: str, html_report: str, ttl_report: str, extension: str, file_name: str):
+    logger.debug(f'start creating report with extension {extension}')
     if extension == TTL_EXTENSION:
         report_path = ttl_report
         report_filename = create_file_name(filename=file_name, file_type=TTL_EXTENSION)
 
     elif extension == HTML_EXTENSION:
+        logger.debug('generate HTML report')
         prepare_eds4jinja_context(location, ttl_report)
         report_path = generate_validation_report(location)
         report_filename = create_file_name(filename=file_name, file_type=HTML_EXTENSION)
 
     elif extension == ZIP_EXTENSION:
+        logger.debug('generate HTML report')
         prepare_eds4jinja_context(location, ttl_report)
         shacl_html_report = generate_validation_report(location)
 
@@ -198,17 +201,20 @@ def create_report(location: str, html_report: str, ttl_report: str, extension: s
         shacl_html_filename = create_file_name(filename='shacl-' + file_name, file_type=HTML_EXTENSION)
         report_filename = create_file_name(filename=file_name, file_type=ZIP_EXTENSION)
 
+        logger.debug('zipping report')
         report_path = str(Path(location) / 'report.zip')
         with ZipFile(report_path, 'w') as zip_report:
             zip_report.write(html_report, arcname=html_filename)
             zip_report.write(shacl_html_report, arcname=shacl_html_filename)
             zip_report.write(ttl_report, arcname=ttl_filename)
 
+    logger.debug(f'finish creating report with extension {extension}')
     return report_path, report_filename
 
 
 def build_report_from_file(location: str, data_file: str, schema_files: list, extension: str,
                            file_name: str = 'file') -> tuple:
+    logger.debug('start building report from file')
     html_report, ttl_report = run_file_validator(data_file=data_file,
                                                  schemas=schema_files,
                                                  output=str(Path(location)) + '/')
@@ -218,6 +224,7 @@ def build_report_from_file(location: str, data_file: str, schema_files: list, ex
 
 def build_report_from_sparql_endpoint(location: str, endpoint: str, graphs: list, schema_files: list, extension: str,
                                       file_name: str = 'file') -> tuple:
+    logger.debug('start building report from sparql endpoint')
     html_report, ttl_report = run_sparql_endpoint_validator(sparql_endpoint_url=endpoint,
                                                             graphs_uris=graphs,
                                                             schemas=schema_files,
