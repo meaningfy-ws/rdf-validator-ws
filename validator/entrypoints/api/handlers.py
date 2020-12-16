@@ -16,11 +16,12 @@ from flask import send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import UnsupportedMediaType, InternalServerError, UnprocessableEntity
 
+from validator.config import RDF_VALIDATOR_LOGGER
 from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES, REPORT_EXTENSIONS, \
     DEFAULT_REPORT_EXTENSION
 from validator.service_layer.handlers import build_report_from_file, build_report_from_sparql_endpoint
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
 
 
 def validate_file(data_file: FileStorage,
@@ -35,6 +36,8 @@ def validate_file(data_file: FileStorage,
     :return: the validation report in the requested format
     :rtype: report file (html, ttl or zip format), int
     """
+    logger.debug('start validate file endpoint')
+
     schema_files = list()
     for schema_file in [schema_file0, schema_file1, schema_file2, schema_file3, schema_file4]:
         if schema_file:
@@ -47,12 +50,14 @@ def validate_file(data_file: FileStorage,
     if file_exceptions:
         exception_text = 'File type errors: ' + ', '.join(file_exceptions) + '. Acceptable types: ' + \
                          ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
-        raise UnsupportedMediaType(exception_text)
+        logger.exception(exception_text)
+        raise UnsupportedMediaType(exception_text)  # 415
 
     if report_extension not in REPORT_EXTENSIONS:
-        raise UnprocessableEntity(
-            'Wrong report_extension format. Accepted formats: '
-            f'{", ".join([format for format in REPORT_EXTENSIONS])}')
+        exception_text = 'Wrong report_extension format. Accepted formats: ' \
+                         f'{", ".join([format for format in REPORT_EXTENSIONS])}'
+        logger.exception(exception_text)
+        raise UnprocessableEntity(exception_text)  # 422
 
     try:
         with tempfile.TemporaryDirectory() as temp_folder:
@@ -69,10 +74,10 @@ def validate_file(data_file: FileStorage,
                                                                   str(local_data_file),
                                                                   local_schema_files,
                                                                   report_extension, data_file.filename)
-
+            logger.debug('finish validate file endpoint')
             return send_file(report_path, as_attachment=True, attachment_filename=report_filename)  # 200
     except Exception as e:
-        logger.exception(e)
+        logger.exception(str(e))
         raise InternalServerError(str(e))
 
 
@@ -91,6 +96,8 @@ def validate_sparql_endpoint(body,
     :return: the validation ttl file
     :rtype: ttl file, int
     """
+    logger.debug('start validate sparql endpoint')
+
     schema_files = list()
     for schema_file in [schema_file0, schema_file1, schema_file2, schema_file3, schema_file4]:
         if schema_file:
@@ -98,7 +105,6 @@ def validate_sparql_endpoint(body,
 
     sparql_endpoint_url = body.get('sparql_endpoint_url')
     graphs = body.get('graphs')
-
     file_exceptions = list()
     for file in schema_files:
         if not _guess_file_type(file.filename):
@@ -106,12 +112,14 @@ def validate_sparql_endpoint(body,
     if file_exceptions:
         exception_text = 'File type errors: ' + ', '.join(file_exceptions) + '. Acceptable types: ' + \
                          ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
-        raise UnsupportedMediaType(exception_text)
+        logger.exception(exception_text)
+        raise UnsupportedMediaType(exception_text)  # 415
 
     if report_extension not in REPORT_EXTENSIONS:
-        raise UnprocessableEntity(
-            'Wrong report_extension format. Accepted formats: '
-            f'{", ".join([format for format in REPORT_EXTENSIONS])}')
+        exception_text = 'Wrong report_extension format. Accepted formats: ' \
+                         f'{", ".join([format for format in REPORT_EXTENSIONS])}'
+        logger.exception(exception_text)
+        raise UnprocessableEntity(exception_text)  # 422
 
     try:
         with tempfile.TemporaryDirectory() as temp_folder:
@@ -127,8 +135,8 @@ def validate_sparql_endpoint(body,
                                                                              local_schema_files,
                                                                              report_extension,
                                                                              'filename')
-
+            logger.debug('finish validate sparql endpoint')
             return send_file(report_path, as_attachment=True, attachment_filename=report_filename)  # 200
     except Exception as e:
-        logger.exception(e)
+        logger.exception(str(e))
         raise InternalServerError(str(e))  # 500

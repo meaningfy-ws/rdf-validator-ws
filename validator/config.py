@@ -32,6 +32,8 @@ RDF_VALIDATOR_UI_PORT = os.environ.get('RDF_VALIDATOR_UI_PORT', 4010)
 RDF_VALIDATOR_UI_SERVICE = str(RDF_VALIDATOR_UI_LOCATION) + ":" + str(RDF_VALIDATOR_UI_PORT)
 RDF_VALIDATOR_UI_SECRET_KEY = os.environ.get('RDF_VALIDATOR_UI_SECRET_KEY', 'secret key api')
 
+RDF_VALIDATOR_LOGGER = 'validator'
+
 
 class FlaskConfig:
     """
