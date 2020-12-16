@@ -43,7 +43,7 @@ class AbstractValidatorWrapper(abc.ABC):
             self.__logger.fatal(f'Subprocess: {output.decode()}')
             raise SubprocessFailure(output)
 
-        self.__logger.info('Subprocess finished successfully: ' + self.__COMMAND__)
+        self.__logger.info('Subprocess finished successfully: ' + self.__COMMAND__ + " with arguments: " + str(args))
         return output.decode()
 
 

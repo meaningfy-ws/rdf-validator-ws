@@ -8,6 +8,7 @@
 """ """
 import json
 import logging
+import pathlib
 from distutils.dir_util import copy_tree
 from pathlib import Path
 from typing import List, Union
@@ -23,11 +24,15 @@ from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP
 logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
 
 
-def __copy_static_content(from_path, to_path):
-    if Path(from_path).is_dir():
-        copy_tree(from_path, to_path)
+def __copy_static_content(configuration_context: dict) -> None:
+    """
+    :param configuration_context: the configuration context for the currently executing processing pipeline
+    :rtype: None
+    """
+    if pathlib.Path(configuration_context["static_folder"]).is_dir():
+        copy_tree(configuration_context["static_folder"], configuration_context["output_folder"])
     else:
-        logger.warning(from_path + " is not a directory!")
+        logger.warning(configuration_context["static_folder"] + " is not a directory !")
 
 
 def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Path]) -> tuple:
@@ -120,7 +125,7 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
     if graphs_uris is None or len(graphs_uris) == 0:
         graph_param = ""
     else:
-        graph_param = "-g" + ", ".join([graph for graph in graphs_uris])
+        graph_param = ", ".join([graph for graph in graphs_uris])
 
     cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/rdfunit/rdfunit-validate.jar",
                                                       "-d", sparql_endpoint_url,
@@ -129,7 +134,8 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
                                                       "-r", 'shacl',
                                                       "-C", "-T", "0", "-D", str(RDFUNIT_QUERY_DELAY_MS),
                                                       "-o", 'html,ttl',
-                                                      "-f", str(output))
+                                                      "-f", str(output),
+                                                      "-g", graph_param)
     logger.debug("RDFUnitWrapper finished with output:\n" + cli_output)
 
     parsed_uri = urlparse(sparql_endpoint_url)
