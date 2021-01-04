@@ -19,11 +19,10 @@ COPY --from=build /RDFUnit-master/rdfunit-validate/target/rdfunit-validate-*-sta
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-CMD gunicorn --timeout ${RDF_VALIDATOR_GUNICORN_TIMEOUT} --workers 10  --bind 0.0.0.0:${RDF_VALIDATOR_API_PORT} --reload --log-level=debug validator.entrypoints.api.run:app
+CMD gunicorn --timeout ${RDF_VALIDATOR_GUNICORN_TIMEOUT} --workers ${RDF_VALIDATOR_GUNICORN_API_WORKERS} --bind 0.0.0.0:${RDF_VALIDATOR_API_PORT} --reload --log-level=debug validator.entrypoints.api.run:app
