@@ -18,10 +18,10 @@ from zipfile import ZipFile
 from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
-from validator.config import RDFUNIT_QUERY_DELAY_MS, RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION, RDF_VALIDATOR_LOGGER
+from validator.config import ValidatorConfig as config
 from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION
 
-logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
+logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 
 
 def __copy_static_content(configuration_context: dict) -> None:
@@ -132,7 +132,7 @@ def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[st
                                                       "-e", sparql_endpoint_url,
                                                       "-s", ", ".join([schema for schema in schemas]),
                                                       "-r", 'shacl',
-                                                      "-C", "-T", "0", "-D", str(RDFUNIT_QUERY_DELAY_MS),
+                                                      "-C", "-T", "0", "-D", str(config.RDFUNIT_QUERY_DELAY_MS),
                                                       "-o", 'html,ttl',
                                                       "-f", str(output),
                                                       "-g", graph_param)
@@ -163,15 +163,15 @@ def generate_validation_report(path_to_report: Union[str, Path]) -> str:
 
 
 def prepare_eds4jinja_context(report_path, source_file):
-    logger.debug(f"Building with template location: {RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION}")
-    copy_tree(RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION, report_path)
+    logger.debug(f"Building with template location: {config.RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION}")
+    copy_tree(config.RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION, report_path)
 
     with open(Path(report_path) / "config.json", 'r+') as config_file:
-        config = json.load(config_file)
-        config["conf"]["report_data_file"] = source_file
-        logger.debug(config)
+        config_data = json.load(config_file)
+        config_data["conf"]["report_data_file"] = source_file
+        logger.debug(config_data)
         config_file.seek(0)
-        json.dump(config, config_file)
+        json.dump(config_data, config_file)
         config_file.truncate()
 
 

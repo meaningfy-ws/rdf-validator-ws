@@ -10,10 +10,10 @@ Production API server through connexion definitions.
 """
 import logging
 
-from validator.config import RDF_VALIDATOR_DEBUG, ProductionConfig, DevelopmentConfig
+from validator.config import ProductionConfig, DevelopmentConfig, ValidatorConfig as config
 from validator.entrypoints.api import app
 
-if RDF_VALIDATOR_DEBUG:
+if config.RDF_VALIDATOR_DEBUG:
     app.config.from_object(DevelopmentConfig())
 else:
     app.config.from_object(ProductionConfig())

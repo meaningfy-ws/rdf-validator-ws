@@ -15,7 +15,7 @@ from pathlib import Path
 
 from flask import render_template, flash, send_from_directory, redirect, url_for
 
-from validator.config import RDF_VALIDATOR_LOGGER
+from validator.config import ValidatorConfig as config
 from validator.entrypoints.api.helpers import TTL_EXTENSION
 from validator.entrypoints.ui import app
 from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_file, \
@@ -23,7 +23,7 @@ from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_f
 from validator.entrypoints.ui.forms import ValidateFromFileForm, ValidateSPARQLEndpointForm
 from validator.entrypoints.ui.helpers import get_error_message_from_response
 
-logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
+logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 
 
 @app.route('/', methods=['GET'])

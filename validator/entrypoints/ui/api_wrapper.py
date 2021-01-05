@@ -13,7 +13,7 @@ from typing import List
 import requests
 from werkzeug.datastructures import FileStorage
 
-from validator import config
+from validator.config import ValidatorConfig as config
 
 
 def validate_file(data_file: FileStorage, schema_files: List[FileStorage], report_extension: str) -> tuple:
