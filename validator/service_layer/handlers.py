@@ -20,6 +20,7 @@ from eds4jinja2.builders.report_builder import ReportBuilder
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
 from validator.config import ValidatorConfig as config
 from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION
+from validator.service_layer.helpers import create_file_name, get_custom_shacl_shape_files, SHACLShapesMissing
 
 logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 
@@ -63,43 +64,6 @@ def run_file_validator(data_file: str, schemas: List[str], output: Union[str, Pa
         data_file).name + ".shaclTestCaseResult"
     output_file_full_path = Path(output) / 'results' / output_file_name
     return str(output_file_full_path) + ".html", str(output_file_full_path) + ".ttl"
-
-
-# def run_endpoint_validator(dataset_uri: str, graphs_uris: List[str], schemas: List[str], output: Path) -> str:
-#     """
-#         Execute the RDF Unit or any other validator.
-#         Possibilities: upload output to a SPARQL endpoint, or write it into a file.
-#     :param graphs_uris: the URIs of the graphs
-#     :param dataset_uri: states a URI that relates to the tested dataset
-#     :param schemas: schemas also required for running an evaluation
-#     :param output: the output directory
-#     :return: nothing
-#
-#     Please see https://github.com/AKSW/RDFUnit/wiki/CLI for a comprehensive description of the parameters
-#     """
-#
-#     logger.debug("RDFUnitWrapper' starting ...")
-#     validator_wrapper: AbstractValidatorWrapper
-#     validator_wrapper = RDFUnitWrapper("java")
-#
-#     cli_output = validator_wrapper.execute_subprocess("-jar", "/usr/src/app/rdfunit-validate.jar",
-#                                                       "-d", dataset_uri,
-#                                                       "" if (len(graphs_uris) == 0) else " -g " + ", ".join(
-#                                                           [graph for graph in graphs_uris]),
-#                                                       "-s" + ", ".join(
-#                                                           [schema for schema in schemas]),
-#                                                       "-r", 'shacl',
-#                                                       "-o", 'html,ttl',
-#                                                       "-f" + str(output)
-#                                                       )
-#     logger.debug("RDFUnitWrapper finished with output:\n" + cli_output)
-#
-#     parsed_uri = urlparse(dataset_uri)
-#     output_file_name = parsed_uri.netloc.replace(":", "_") + \
-#                        parsed_uri.path.replace("/", "_") + \
-#                        ".shaclTestCaseResult.html"
-#
-#     return Path(output) / "results" / output_file_name
 
 
 def run_sparql_endpoint_validator(sparql_endpoint_url: str, graphs_uris: List[str],
@@ -175,10 +139,6 @@ def prepare_eds4jinja_context(report_path, source_file):
         config_file.truncate()
 
 
-def create_file_name(filename: str, file_type: str = TTL_EXTENSION) -> str:
-    return Path(filename).stem + f'-report.{file_type}'
-
-
 def create_report(location: str, html_report: str, ttl_report: str, extension: str, file_name: str):
     logger.debug(f'start creating report with extension {extension}')
     if extension == TTL_EXTENSION:
@@ -215,6 +175,13 @@ def create_report(location: str, html_report: str, ttl_report: str, extension: s
 def build_report_from_file(location: str, data_file: str, schema_files: list, extension: str,
                            file_name: str = 'file') -> tuple:
     logger.debug('start building report from file')
+
+    schema_files += get_custom_shacl_shape_files()
+    if not schema_files:
+        exception_text = f'No SHACL shape files provided for validation'
+        logger.exception(exception_text)
+        raise SHACLShapesMissing(exception_text)
+
     html_report, ttl_report = run_file_validator(data_file=data_file,
                                                  schemas=schema_files,
                                                  output=str(Path(location)) + '/')
@@ -225,6 +192,13 @@ def build_report_from_file(location: str, data_file: str, schema_files: list, ex
 def build_report_from_sparql_endpoint(location: str, endpoint: str, graphs: list, schema_files: list, extension: str,
                                       file_name: str = 'file') -> tuple:
     logger.debug('start building report from sparql endpoint')
+
+    schema_files += get_custom_shacl_shape_files()
+    if not schema_files:
+        exception_text = f'No SHACL shape files provided for validation'
+        logger.exception(exception_text)
+        raise SHACLShapesMissing(exception_text)
+
     html_report, ttl_report = run_sparql_endpoint_validator(sparql_endpoint_url=endpoint,
                                                             graphs_uris=graphs,
                                                             schemas=schema_files,
