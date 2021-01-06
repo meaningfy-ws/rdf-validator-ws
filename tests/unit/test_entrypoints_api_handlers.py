@@ -61,6 +61,20 @@ def test_validate_file_success_multiple_shacl_files_success(mock_build_report_fr
     assert 'validation success' in response.data.decode()
 
 
+def test_validate_file_external_shapes_not_accepted_failure(api_client, monkeypatch):
+    monkeypatch.setenv('RDF_VALIDATOR_SHACL_SHAPES_PATH', 'some/path')
+    monkeypatch.setenv('RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES', 'false')
+    data = {
+        'data_file': FileStorage(BytesIO(b'data file content'), 'data.ttl'),
+        'schema_file0': FileStorage(BytesIO(b''), 'schema_' + 'shacl0.ttl'),
+        'schema_file1': FileStorage(BytesIO(b''), 'schema_' + 'shacl1.ttl')
+    }
+    response = api_client.post('/validate-file', data=data, content_type='multipart/form-data')
+
+    assert response.status_code == 400
+    assert 'This configuration of the validator doesn\'t accept external SHACL shapes.' in response.json.get('detail')
+
+
 def test_validate_file_type_exception_one(api_client):
     unacceptable_filename = 'schema_file.pdf'
     data = {

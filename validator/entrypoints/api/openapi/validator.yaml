@@ -38,9 +38,15 @@ paths:
               $ref: '#/components/schemas/FileValidator'
       responses:
         200:
-          description: Request to validate endpoint successfully accepted for processing.
+          description: Request to validate endpoint successfully accepted for processing
+        400:
+          description: This configuration of the validator doesn't accept external SHACL shapes
+        415:
+          description: Unacceptable file types
+        422:
+          description: Wrong report extension format
         5XX:
-          description: Unexpected Error.
+          description: Unexpected Error
   /validate-sparql-endpoint:
     post:
       operationId: validator.entrypoints.api.handlers.validate_sparql_endpoint
@@ -86,13 +92,18 @@ paths:
                   type: string
                   description: The endpoint to validate
               required:
-                - schema_file0
                 - sparql_endpoint_url
       responses:
         200:
-          description: Request to validate endpoint successfully accepted for processing.
+          description: Request to validate endpoint successfully accepted for processing
+        400:
+          description: This configuration of the validator doesn't accept external SHACL shapes
+        415:
+          description: Unacceptable file types
+        422:
+          description: Wrong report extension format
         5XX:
-          description: Unexpected Error.
+          description: Unexpected Error
 
 components:
   schemas:
@@ -132,5 +143,4 @@ components:
               format: binary
               description: The data content to validate
           required:
-            - schema_file0
             - data_file

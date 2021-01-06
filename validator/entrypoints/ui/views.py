@@ -15,7 +15,7 @@ from pathlib import Path
 
 from flask import render_template, flash, send_from_directory, redirect, url_for
 
-from validator.config import RDF_VALIDATOR_LOGGER
+from validator.config import ValidatorConfig as config
 from validator.entrypoints.api.helpers import TTL_EXTENSION
 from validator.entrypoints.ui import app
 from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_file, \
@@ -23,7 +23,7 @@ from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_f
 from validator.entrypoints.ui.forms import ValidateFromFileForm, ValidateSPARQLEndpointForm
 from validator.entrypoints.ui.helpers import get_error_message_from_response
 
-logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
+logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 
 
 @app.route('/', methods=['GET'])
@@ -59,7 +59,9 @@ def validate_file():
                 return send_from_directory(Path(temp_folder), f'report.{report_extension}', as_attachment=True)
 
     logger.debug('render validate file clean view')
-    return render_template('validate/file.html', form=form, title='Validate File')
+    return render_template('validate/file.html', form=form, title='Validate File',
+                           validator_name=config.RDF_VALIDATOR_UI_NAME,
+                           render_shacl_shapes=config.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES)
 
 
 @app.route('/validate-sparql-endpoint', methods=['GET', 'POST'])
@@ -90,4 +92,6 @@ def validate_sparql_endpoint():
                 return send_from_directory(Path(temp_folder), f'report.{report_extension}', as_attachment=True)
 
     logger.debug('request validate sparql endpoint clean view')
-    return render_template('validate/sparql_endpoint.html', form=form, title='Validate SPARQL Endpoint')
+    return render_template('validate/sparql_endpoint.html', form=form, title='Validate SPARQL Endpoint',
+                           validator_name=config.RDF_VALIDATOR_UI_NAME,
+                           render_shacl_shapes=config.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES)

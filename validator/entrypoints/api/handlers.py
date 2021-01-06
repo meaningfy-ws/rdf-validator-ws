@@ -14,18 +14,17 @@ from pathlib import Path
 
 from flask import send_file
 from werkzeug.datastructures import FileStorage
-from werkzeug.exceptions import UnsupportedMediaType, InternalServerError, UnprocessableEntity
+from werkzeug.exceptions import InternalServerError
 
-from validator.config import RDF_VALIDATOR_LOGGER
-from validator.entrypoints.api.helpers import _guess_file_type, INPUT_MIME_TYPES, REPORT_EXTENSIONS, \
-    DEFAULT_REPORT_EXTENSION
+from validator.config import ValidatorConfig as config
+from validator.entrypoints.api.helpers import DEFAULT_REPORT_EXTENSION, check_for_file_exceptions
 from validator.service_layer.handlers import build_report_from_file, build_report_from_sparql_endpoint
 
-logger = logging.getLogger(RDF_VALIDATOR_LOGGER)
+logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 
 
 def validate_file(data_file: FileStorage,
-                  schema_file0: FileStorage, schema_file1: FileStorage = None, schema_file2: FileStorage = None,
+                  schema_file0: FileStorage = None, schema_file1: FileStorage = None, schema_file2: FileStorage = None,
                   schema_file3: FileStorage = None, schema_file4: FileStorage = None,
                   report_extension: str = DEFAULT_REPORT_EXTENSION) -> tuple:
     """
@@ -38,26 +37,8 @@ def validate_file(data_file: FileStorage,
     """
     logger.debug('start validate file endpoint')
 
-    schema_files = list()
-    for schema_file in [schema_file0, schema_file1, schema_file2, schema_file3, schema_file4]:
-        if schema_file:
-            schema_files.append(schema_file)
-
-    file_exceptions = list()
-    for file in [data_file, *schema_files]:
-        if not _guess_file_type(file.filename):
-            file_exceptions.append(file.filename)
-    if file_exceptions:
-        exception_text = 'File type errors: ' + ', '.join(file_exceptions) + '. Acceptable types: ' + \
-                         ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
-        logger.exception(exception_text)
-        raise UnsupportedMediaType(exception_text)  # 415
-
-    if report_extension not in REPORT_EXTENSIONS:
-        exception_text = 'Wrong report_extension format. Accepted formats: ' \
-                         f'{", ".join([format for format in REPORT_EXTENSIONS])}'
-        logger.exception(exception_text)
-        raise UnprocessableEntity(exception_text)  # 422
+    schema_files = list(filter(None, [schema_file0, schema_file1, schema_file2, schema_file3, schema_file4]))
+    check_for_file_exceptions(schema_files, [data_file, *schema_files], report_extension)
 
     try:
         with tempfile.TemporaryDirectory() as temp_folder:
@@ -78,16 +59,16 @@ def validate_file(data_file: FileStorage,
             return send_file(report_path, as_attachment=True, attachment_filename=report_filename)  # 200
     except Exception as e:
         logger.exception(str(e))
-        raise InternalServerError(str(e))
+        raise InternalServerError(str(e))  # 500
 
 
 def validate_sparql_endpoint(body,
-                             schema_file0: FileStorage, schema_file1: FileStorage = None,
+                             schema_file0: FileStorage = None, schema_file1: FileStorage = None,
                              schema_file2: FileStorage = None, schema_file3: FileStorage = None,
                              schema_file4: FileStorage = None,
                              report_extension: str = DEFAULT_REPORT_EXTENSION) -> tuple:
     """
-  
+    API method to handle SPARQL endpoint validation.
     :param body: a dictionary with the json fields:
         :sparql_endpoint_url - The endpoint to validate
         :graphs - An optional list of named graphs to restrict the scope of the validation
@@ -98,28 +79,11 @@ def validate_sparql_endpoint(body,
     """
     logger.debug('start validate sparql endpoint')
 
-    schema_files = list()
-    for schema_file in [schema_file0, schema_file1, schema_file2, schema_file3, schema_file4]:
-        if schema_file:
-            schema_files.append(schema_file)
+    schema_files = list(filter(None, [schema_file0, schema_file1, schema_file2, schema_file3, schema_file4]))
+    check_for_file_exceptions(schema_files, schema_files, report_extension)
 
     sparql_endpoint_url = body.get('sparql_endpoint_url')
     graphs = body.get('graphs')
-    file_exceptions = list()
-    for file in schema_files:
-        if not _guess_file_type(file.filename):
-            file_exceptions.append(file.filename)
-    if file_exceptions:
-        exception_text = 'File type errors: ' + ', '.join(file_exceptions) + '. Acceptable types: ' + \
-                         ', '.join([f'{key}({value})' for (key, value) in INPUT_MIME_TYPES.items()]) + '.'
-        logger.exception(exception_text)
-        raise UnsupportedMediaType(exception_text)  # 415
-
-    if report_extension not in REPORT_EXTENSIONS:
-        exception_text = 'Wrong report_extension format. Accepted formats: ' \
-                         f'{", ".join([format for format in REPORT_EXTENSIONS])}'
-        logger.exception(exception_text)
-        raise UnprocessableEntity(exception_text)  # 422
 
     try:
         with tempfile.TemporaryDirectory() as temp_folder:

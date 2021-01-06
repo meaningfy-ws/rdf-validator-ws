@@ -8,31 +8,105 @@
 """
 Project wide configuration file.
 """
+import logging
 import os
+from distutils.util import strtobool
 from pathlib import Path
+from typing import Optional
 
 
-RDFUNIT_QUERY_DELAY_MS = os.environ.get('RDFUNIT_QUERY_DELAY_MS', 1)
-RDF_VALIDATOR_DEBUG = os.environ.get('RDF_VALIDATOR_DEBUG', True)
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return classmethod(self.fget).__get__(None, owner)()
 
-if os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION') \
-        and Path(os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')).exists() \
-        and any(Path(os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')).iterdir()):
-    RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION = os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')
-else:
-    RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION = Path(__file__).parents[1] / 'resources/templates/validator_report'
 
-RDF_VALIDATOR_API_LOCATION = os.environ.get('RDF_VALIDATOR_API_LOCATION', 'http://fingerprinter-api')
-RDF_VALIDATOR_API_PORT = os.environ.get('RDF_VALIDATOR_API_PORT', 4010)
-RDF_VALIDATOR_API_SERVICE = str(RDF_VALIDATOR_API_LOCATION) + ":" + str(RDF_VALIDATOR_API_PORT)
-RDF_VALIDATOR_API_SECRET_KEY = os.environ.get('RDF_VALIDATOR_API_SECRET_KEY', 'secret key api')
+class ValidatorConfig:
+    logger_name = 'validator'
+    logger = logging.getLogger(logger_name)
 
-RDF_VALIDATOR_UI_LOCATION = os.environ.get('RDF_VALIDATOR_UI_LOCATION', 'http://fingerprinter-api')
-RDF_VALIDATOR_UI_PORT = os.environ.get('RDF_VALIDATOR_UI_PORT', 4010)
-RDF_VALIDATOR_UI_SERVICE = str(RDF_VALIDATOR_UI_LOCATION) + ":" + str(RDF_VALIDATOR_UI_PORT)
-RDF_VALIDATOR_UI_SECRET_KEY = os.environ.get('RDF_VALIDATOR_UI_SECRET_KEY', 'secret key api')
+    @classproperty
+    def RDF_VALIDATOR_LOGGER(cls) -> str:
+        value = cls.logger_name
+        cls.logger.debug(value)
+        return value
 
-RDF_VALIDATOR_LOGGER = 'validator'
+    @classproperty
+    def RDFUNIT_QUERY_DELAY_MS(cls) -> int:
+        value = int(os.environ.get('RDFUNIT_QUERY_DELAY_MS', 1))
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_DEBUG(cls) -> bool:
+        value = strtobool(os.environ.get('RDF_VALIDATOR_DEBUG', 'true'))
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION(cls) -> str:
+        if os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION') \
+                and Path(os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')).exists() \
+                and any(Path(os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')).iterdir()):
+            value = os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')
+        else:
+            value = str(Path(__file__).parents[1] / 'resources/templates/validator_report')
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_REPORT_TITLE(cls) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_REPORT_TITLE', 'SHACL shape validation report').strip('"')
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_UI_NAME(cls) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_UI_NAME', 'RDF Validator').strip('"')
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_SHACL_SHAPES_PATH(cls) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_PATH')
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES(cls) -> bool:
+        if cls.RDF_VALIDATOR_SHACL_SHAPES_PATH:
+            value = strtobool(os.environ.get('RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES', 'true').lower())
+        else:
+            value = True
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_API_SERVICE(cls) -> str:
+        location = os.environ.get('RDF_VALIDATOR_API_LOCATION', 'http://fingerprinter-api')
+        port = os.environ.get('RDF_VALIDATOR_API_PORT', 4010)
+        value = f'{location}:{port}'
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_UI_SERVICE(cls) -> str:
+        location = os.environ.get('RDF_VALIDATOR_UI_LOCATION', 'http://fingerprinter-ui')
+        port = os.environ.get('RDF_VALIDATOR_UI_PORT', 8010)
+        value = f'{location}:{port}'
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_API_SECRET_KEY(cls) -> str:
+        value = os.environ.get('RDF_VALIDATOR_API_SECRET_KEY', 'secret key api')
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_UI_SECRET_KEY(cls) -> str:
+        value = os.environ.get('RDF_VALIDATOR_UI_SECRET_KEY', 'secret key api')
+        cls.logger.debug(value)
+        return value
 
 
 class FlaskConfig:
