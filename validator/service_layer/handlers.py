@@ -120,7 +120,8 @@ def generate_validation_report(path_to_report: Union[str, Path]) -> str:
     :param path_to_report: the location of the template file(s) that will be used to render the output
     :return: path to the html report
     """
-    report_builder = ReportBuilder(path_to_report)
+    report_builder = ReportBuilder(path_to_report,
+                                   additional_config={'conf': {'title': config.RDF_VALIDATOR_REPORT_TITLE}})
     report_builder.add_after_rendering_listener(__copy_static_content)
     report_builder.make_document()
     return str(path_to_report) + "/output/" + "main.html"

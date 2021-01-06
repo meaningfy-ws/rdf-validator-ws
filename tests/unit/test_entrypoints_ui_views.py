@@ -32,6 +32,16 @@ def test_index(ui_client):
     assert 'Validate File' in title.get_text()
 
 
+def test_custom_ui_name(ui_client, monkeypatch):
+    ui_url = '/'
+    monkeypatch.setenv('RDF_VALIDATOR_UI_NAME', 'Custom Validator')
+
+    soup = _helper_get_request_and_parse(ui_client, ui_url)
+
+    name = soup.find(id='website-name')
+    assert 'Custom Validator' in name.get_text()
+
+
 @patch('validator.entrypoints.ui.views.api_validate_file')
 def test_validate_file(mock_api_validate_file, ui_client):
     ui_url = '/validate-file'

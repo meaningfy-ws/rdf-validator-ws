@@ -54,6 +54,18 @@ class ValidatorConfig:
         return value
 
     @classproperty
+    def RDF_VALIDATOR_REPORT_TITLE(cls) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_REPORT_TITLE', 'SHACL shape validation report').strip('"')
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
+    def RDF_VALIDATOR_UI_NAME(cls) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_UI_NAME', 'RDF Validator').strip('"')
+        cls.logger.debug(value)
+        return value
+
+    @classproperty
     def RDF_VALIDATOR_SHACL_SHAPES_PATH(cls) -> Optional[str]:
         value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_PATH')
         cls.logger.debug(value)

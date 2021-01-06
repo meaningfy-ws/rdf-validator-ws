@@ -59,7 +59,9 @@ def validate_file():
                 return send_from_directory(Path(temp_folder), f'report.{report_extension}', as_attachment=True)
 
     logger.debug('render validate file clean view')
-    return render_template('validate/file.html', form=form, title='Validate File')
+    return render_template('validate/file.html', form=form, title='Validate File',
+                           validator_name=config.RDF_VALIDATOR_UI_NAME,
+                           render_shacl_shapes=config.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES)
 
 
 @app.route('/validate-sparql-endpoint', methods=['GET', 'POST'])
@@ -90,4 +92,6 @@ def validate_sparql_endpoint():
                 return send_from_directory(Path(temp_folder), f'report.{report_extension}', as_attachment=True)
 
     logger.debug('request validate sparql endpoint clean view')
-    return render_template('validate/sparql_endpoint.html', form=form, title='Validate SPARQL Endpoint')
+    return render_template('validate/sparql_endpoint.html', form=form, title='Validate SPARQL Endpoint',
+                           validator_name=config.RDF_VALIDATOR_UI_NAME,
+                           render_shacl_shapes=config.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES)
