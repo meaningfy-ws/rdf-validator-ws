@@ -44,7 +44,7 @@ paths:
         415:
           description: Unacceptable file types
         422:
-          description: Wront report extension format
+          description: Wrong report extension format
         5XX:
           description: Unexpected Error
   /validate-sparql-endpoint:
@@ -101,7 +101,7 @@ paths:
         415:
           description: Unacceptable file types
         422:
-          description: Wront report extension format
+          description: Wrong report extension format
         5XX:
           description: Unexpected Error
 

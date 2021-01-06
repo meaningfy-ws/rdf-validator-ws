@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>{{ validator_name | default('RDF Differ', true) }}</title>
+    <title>{{ validator_name  }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="Meaningfy" content="RDF-Differ">
@@ -22,7 +22,7 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light green lighten-3">
             <div class="container">
                 <a id="website-name" href="{{ url_for('index') }}"
-                   style="color: #1e1e1e">{{ validator_name | default('RDF Differ', true) }}</a>
+                   style="color: #1e1e1e">{{ validator_name }}</a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                     {% for href, id, caption in navigation_bar %}
                         <li class="nav-item{% if id == active_page %} active{% endif %}">
