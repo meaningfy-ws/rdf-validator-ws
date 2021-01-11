@@ -72,14 +72,14 @@ class ValidatorConfig:
         return value
 
     @property
-    def RDF_VALIDATOR_SHACL_SHAPES_PATH(self) -> Optional[str]:
-        value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_PATH')
+    def RDF_VALIDATOR_HAS_CUSTOM_SHAPES(self) -> bool:
+        value = strtobool(os.environ.get('RDF_VALIDATOR_HAS_CUSTOM_SHAPES', 'false').lower())
         self.logger.debug(value)
         return value
 
     @property
-    def RDF_VALIDATOR_HAS_CUSTOM_SHAPES(self) -> bool:
-        value = strtobool(os.environ.get('RDF_VALIDATOR_HAS_CUSTOM_SHAPES', 'false').lower())
+    def RDF_VALIDATOR_SHACL_SHAPES_PATH(self) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_PATH')
         self.logger.debug(value)
         return value
 

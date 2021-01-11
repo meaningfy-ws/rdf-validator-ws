@@ -28,6 +28,7 @@ test:
 
 build-volumes:
 	@ docker volume create rdf-validator-template
+	@ docker volume create rdf-validator-shacl-shapes
 
 build-services:
 	@ echo -e '$(BUILD_PRINT)Building the containers'
@@ -42,7 +43,7 @@ stop-services:
 	@ docker-compose --file docker/docker-compose.yml --env-file docker/.env stop
 
 #-----------------------------------------------------------------------------
-# Template commands
+# custom configuration commands
 #-----------------------------------------------------------------------------
 
 set-report-template:
@@ -51,6 +52,15 @@ set-report-template:
 	@ docker volume rm rdf-validator-template | true
 	@ docker volume create rdf-validator-template
 	@ docker container create --name temp -v rdf-validator-template:/data busybox
+	@ docker cp $(location). temp:/data
+	@ docker rm temp
+
+set-shacl-shapes:
+	@ echo "$(BUILD_PRINT)Copying custom SHACL shapes"
+	@ docker rm temp | true
+	@ docker volume rm rdf-validator-shacl-shapes | true
+	@ docker volume create rdf-validator-shacl-shapes
+	@ docker container create --name temp -v rdf-validator-shacl-shapes:/data busybox
 	@ docker cp $(location). temp:/data
 	@ docker rm temp
 
