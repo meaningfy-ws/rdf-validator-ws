@@ -20,13 +20,25 @@ class ValidatorConfig:
     logger = logging.getLogger(logger_name)
 
     def __init__(self):
+        self.check_if_custom_shacl_shapes_location_defined_but_no_files()
         self.check_if_valid_configuration()
         super().__init__()
 
+    def check_if_custom_shacl_shapes_location_defined_but_no_files(self):
+        if os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION'):
+            if not (Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).exists()
+                    and any(Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).iterdir())):
+                self.logger.debug(
+                    'RDF_VALIDATOR_SHACL_SHAPES_LOCATION was specified but no files found in the directory.')
+                raise RuntimeError()
+
     def check_if_valid_configuration(self):
-        if not self.RDF_VALIDATOR_HAS_CUSTOM_SHAPES and not self.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES:
+        if not (os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')
+                and Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).exists()
+                and any(Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).iterdir())) \
+                and not self.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES:
             self.logger.debug('The validator can\'t run in this configuration. '
-                              'Set at least one of these variables to True: RDF_VALIDATOR_SHACL_SHAPES_PATH or '
+                              'Set at least one of these variables: RDF_VALIDATOR_SHACL_SHAPES_LOCATION or '
                               'RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES.')
             raise RuntimeError()
 
@@ -72,20 +84,14 @@ class ValidatorConfig:
         return value
 
     @property
-    def RDF_VALIDATOR_HAS_CUSTOM_SHAPES(self) -> bool:
-        value = strtobool(os.environ.get('RDF_VALIDATOR_HAS_CUSTOM_SHAPES', 'false').lower())
-        self.logger.debug(value)
-        return value
-
-    @property
-    def RDF_VALIDATOR_SHACL_SHAPES_PATH(self) -> Optional[str]:
-        value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_PATH')
+    def RDF_VALIDATOR_SHACL_SHAPES_LOCATION(self) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')
         self.logger.debug(value)
         return value
 
     @property
     def RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES(self) -> bool:
-        value = strtobool(os.environ.get('RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES', 'true').lower())
+        value = strtobool(os.environ.get('RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES', 'true'))
         self.logger.debug(value)
         return value
 

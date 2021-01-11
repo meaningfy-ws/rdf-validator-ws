@@ -177,7 +177,7 @@ def build_report_from_file(location: str, data_file: str, schema_files: list, ex
                            file_name: str = 'file') -> tuple:
     logger.debug('start building report from file')
 
-    if config.RDF_VALIDATOR_HAS_CUSTOM_SHAPES:
+    if config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION:
         schema_files += get_custom_shacl_shape_files()
     if not schema_files:
         exception_text = f'No SHACL shape files provided for validation'
@@ -195,7 +195,7 @@ def build_report_from_sparql_endpoint(location: str, endpoint: str, graphs: list
                                       file_name: str = 'file') -> tuple:
     logger.debug('start building report from sparql endpoint')
 
-    if config.RDF_VALIDATOR_HAS_CUSTOM_SHAPES:
+    if config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION:
         schema_files += get_custom_shacl_shape_files()
     if not schema_files:
         exception_text = f'No SHACL shape files provided for validation'

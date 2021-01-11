@@ -32,10 +32,10 @@ def get_custom_shacl_shape_files() -> List[str]:
     :return: list of SHACL shapes files
     """
     shacl_shape_files = list()
-    if config.RDF_VALIDATOR_SHACL_SHAPES_PATH:
-        shacl_shape_files = [str(item) for item in Path(config.RDF_VALIDATOR_SHACL_SHAPES_PATH).iterdir()]
+    if config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION:
+        shacl_shape_files = [str(item) for item in Path(config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION).iterdir()]
         if not shacl_shape_files:
-            exception_text = f'No SHACL shape files found at {config.RDF_VALIDATOR_SHACL_SHAPES_PATH}'
+            exception_text = f'No SHACL shape files found at {config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION}'
             logger.exception(exception_text)
             raise SHACLShapesMissing(exception_text)
 
