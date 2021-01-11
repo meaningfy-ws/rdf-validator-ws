@@ -10,7 +10,7 @@ UI server through flask definitions.
 """
 import logging
 
-from validator.config import ProductionConfig, DevelopmentConfig, ValidatorConfig as config
+from validator.config import ProductionConfig, DevelopmentConfig, config
 from validator.entrypoints.ui import app
 
 if config.RDF_VALIDATOR_DEBUG:

@@ -18,7 +18,7 @@ from zipfile import ZipFile
 from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
-from validator.config import ValidatorConfig as config
+from validator.config import config
 from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION
 from validator.service_layer.helpers import create_file_name, get_custom_shacl_shape_files, SHACLShapesMissing
 

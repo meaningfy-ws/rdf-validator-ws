@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import List
 
-from validator.config import ValidatorConfig as config
+from validator.config import config
 from validator.entrypoints.api.helpers import TTL_EXTENSION
 
 logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)

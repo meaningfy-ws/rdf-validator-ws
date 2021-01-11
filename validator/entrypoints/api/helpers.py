@@ -15,7 +15,7 @@ from itertools import filterfalse
 from rdflib.util import guess_format
 from werkzeug.exceptions import BadRequest, UnsupportedMediaType, UnprocessableEntity
 
-from validator.config import ValidatorConfig as config
+from validator.config import config
 
 logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 
