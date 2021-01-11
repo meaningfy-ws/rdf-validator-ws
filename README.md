@@ -56,6 +56,38 @@ make location=~/template/location/ set-report-template
 After this, restart the `rdf-differ-api` container for the effects to take place.
 
 
+### Define a custom validator
+If you intend to use this validator with a custom set of SHACL shape files set the environment variable `RDF_VALIDATOR_SHACL_SHAPES_LOCATION` with a location (the recommended one is `/usr/src/shacl-shapes`).
+
+Add the external volume `rdf-validator-shacl-shapes` to the `docker-compose.yml` configuration.
+```
+validator-api:
+...
+    volumes:
+        - rdf-validator-shacl-shapes:${RDF_VALIDATOR_SHACL_SHAPES_LOCATION}
+
+...
+
+volumes:
+  rdf-validator-shacl-shapes:
+    external: true
+```
+```bash
+make location=<location to template> set-shacl-shapes
+```
+---
+**NOTE**
+
+Make sure that the location specified ends with a trailing slash `/`, otherwise the command will not work.
+
+Example:
+```bash
+make location=~/shacl-shape-files/location/ set-shacl-shapes
+```
+---
+After this, restart the `validator-api` container for the effects to take place.
+
+
 # Usage
 
 ## Start services
