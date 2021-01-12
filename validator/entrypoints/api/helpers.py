@@ -55,11 +55,6 @@ def check_for_file_exceptions(schema_files, files_to_check, report_extension):
         logger.exception(exception_text)
         raise BadRequest(exception_text)  # 400
 
-    if not config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION and not schema_files:
-        exception_text = 'At least one schema file is required.'
-        logger.exception(exception_text)
-        raise BadRequest(exception_text)  # 400
-
     file_exceptions = list(filterfalse(lambda file: _guess_file_type(file.filename), files_to_check))
     if file_exceptions:
         exception_text = 'File type errors: ' + ', '.join([file.filename for file in file_exceptions]) + \

@@ -28,19 +28,20 @@ class ValidatorConfig:
         if os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION'):
             if not (Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).exists()
                     and any(Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).iterdir())):
-                self.logger.debug(
-                    'RDF_VALIDATOR_SHACL_SHAPES_LOCATION was specified but no files found in the directory.')
-                raise RuntimeError()
+                exception_text = 'RDF_VALIDATOR_SHACL_SHAPES_LOCATION was specified but no files found in the directory.'
+                self.logger.fatal(exception_text)
+                raise RuntimeError(exception_text)
 
     def check_if_valid_configuration(self):
         if not (os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')
                 and Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).exists()
                 and any(Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).iterdir())) \
                 and not self.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES:
-            self.logger.debug('The validator can\'t run in this configuration. '
-                              'Set at least one of these variables: RDF_VALIDATOR_SHACL_SHAPES_LOCATION or '
-                              'RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES.')
-            raise RuntimeError()
+            exception_text = 'The validator can\'t run in this configuration. ' \
+                             'Set at least one  variables RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES to True ' \
+                             'or set the location for RDF_VALIDATOR_SHACL_SHAPES_LOCATION.'
+            self.logger.fatal(exception_text)
+            raise RuntimeError(exception_text)
 
     @property
     def RDF_VALIDATOR_LOGGER(self) -> str:
