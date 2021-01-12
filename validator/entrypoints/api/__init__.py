@@ -11,7 +11,7 @@ Module for configuring and exposing the connexion api server using the Flask fra
 
 import connexion
 
-from validator.config import ValidatorConfig as config
+from validator.config import config
 
 connexion_app = connexion.FlaskApp(__name__, specification_dir='openapi')
 connexion_app.add_api('validator.yaml')

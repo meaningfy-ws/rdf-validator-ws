@@ -11,7 +11,7 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
-from validator.config import ValidatorConfig as config
+from validator.config import config
 
 app = Flask(__name__)
 Bootstrap(app)
