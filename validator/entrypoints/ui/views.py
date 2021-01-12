@@ -29,6 +29,7 @@ logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 @app.route('/', methods=['GET'])
 def index():
     logger.debug('request index view')
+    logger.debug('redirect to validate file view')
     return redirect(url_for('validate_file'))
 
 

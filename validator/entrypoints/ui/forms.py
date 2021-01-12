@@ -11,7 +11,7 @@
 """
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import StringField, SubmitField, TextAreaField, RadioField, MultipleFileField
+from wtforms import StringField, TextAreaField, RadioField, MultipleFileField
 from wtforms.validators import DataRequired
 
 from validator.entrypoints.api.helpers import HTML_EXTENSION, TTL_EXTENSION, ZIP_EXTENSION
