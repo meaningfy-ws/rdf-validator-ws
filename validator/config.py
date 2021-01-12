@@ -14,15 +14,22 @@ from distutils.util import strtobool
 from pathlib import Path
 from typing import Optional
 
+API_TYPE = 'api'
+UI_TYPE = 'ui'
+
 
 class ValidatorConfig:
     logger_name = 'validator'
     logger = logging.getLogger(logger_name)
+    type = None
 
-    def __init__(self):
+    def set_as_api_server(self):
+        self.type = API_TYPE
         self.check_if_custom_shacl_shapes_location_defined_but_no_files()
         self.check_if_valid_configuration()
-        super().__init__()
+
+    def set_as_ui_server(self):
+        self.type = UI_TYPE
 
     def check_if_custom_shacl_shapes_location_defined_but_no_files(self):
         if os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION'):
