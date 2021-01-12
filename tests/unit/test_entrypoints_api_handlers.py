@@ -61,8 +61,8 @@ def test_validate_file_success_multiple_shacl_files_success(mock_build_report_fr
     assert 'validation success' in response.data.decode()
 
 
-def test_validate_file_external_shapes_not_accepted_failure(api_client, monkeypatch):
-    monkeypatch.setenv('RDF_VALIDATOR_SHACL_SHAPES_PATH', 'some/path')
+def test_validate_file_custom_and_no_external_shapes(api_client, monkeypatch):
+    monkeypatch.setenv('RDF_VALIDATOR_SHACL_SHAPES_LOCATION', '/some/location')
     monkeypatch.setenv('RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES', 'false')
     data = {
         'data_file': FileStorage(BytesIO(b'data file content'), 'data.ttl'),

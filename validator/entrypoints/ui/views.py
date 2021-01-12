@@ -15,7 +15,7 @@ from pathlib import Path
 
 from flask import render_template, flash, send_from_directory, redirect, url_for
 
-from validator.config import ValidatorConfig as config
+from validator.config import config
 from validator.entrypoints.api.helpers import TTL_EXTENSION
 from validator.entrypoints.ui import app
 from validator.entrypoints.ui.api_wrapper import validate_file as api_validate_file, \

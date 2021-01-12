@@ -27,7 +27,8 @@ services:
       dockerfile: ./docker/api/Dockerfile
     volumes:
       - ..:/usr/src/app
-      - rdf-validator-template:${RDF_VALIDATOR_TEMPLATE_LOCATION}
+#      - rdf-validator-template:${RDF_VALIDATOR_TEMPLATE_LOCATION}
+#      - rdf-validator-shacl-shapes:${RDF_VALIDATOR_SHACL_SHAPES_LOCATION}
     ports:
       - ${RDF_VALIDATOR_API_PORT}:${RDF_VALIDATOR_API_PORT}
     env_file: .env
@@ -50,9 +51,11 @@ services:
     networks:
       - mydefault
 
-volumes:
-  rdf-validator-template:
-    external: true
+#volumes:
+#  rdf-validator-template:
+#    external: true
+#  rdf-validator-shacl-shapes:
+#    external: true
 
 networks:
   mydefault:

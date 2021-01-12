@@ -15,98 +15,117 @@ from pathlib import Path
 from typing import Optional
 
 
-class classproperty(property):
-    def __get__(self, cls, owner):
-        return classmethod(self.fget).__get__(None, owner)()
-
-
 class ValidatorConfig:
     logger_name = 'validator'
     logger = logging.getLogger(logger_name)
 
-    @classproperty
-    def RDF_VALIDATOR_LOGGER(cls) -> str:
-        value = cls.logger_name
-        cls.logger.debug(value)
+    def __init__(self):
+        self.check_if_custom_shacl_shapes_location_defined_but_no_files()
+        self.check_if_valid_configuration()
+        super().__init__()
+
+    def check_if_custom_shacl_shapes_location_defined_but_no_files(self):
+        if os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION'):
+            if not (Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).exists()
+                    and any(Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).iterdir())):
+                exception_text = 'RDF_VALIDATOR_SHACL_SHAPES_LOCATION was specified but no files found in the directory.'
+                self.logger.fatal(exception_text)
+                raise RuntimeError(exception_text)
+
+    def check_if_valid_configuration(self):
+        if not (os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')
+                and Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).exists()
+                and any(Path(os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')).iterdir())) \
+                and not self.RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES:
+            exception_text = 'The validator can\'t run in this configuration. ' \
+                             'Set at least one  variables RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES to True ' \
+                             'or set the location for RDF_VALIDATOR_SHACL_SHAPES_LOCATION.'
+            self.logger.fatal(exception_text)
+            raise RuntimeError(exception_text)
+
+    @property
+    def RDF_VALIDATOR_LOGGER(self) -> str:
+        value = self.logger_name
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDFUNIT_QUERY_DELAY_MS(cls) -> int:
+    @property
+    def RDFUNIT_QUERY_DELAY_MS(self) -> int:
         value = int(os.environ.get('RDFUNIT_QUERY_DELAY_MS', 1))
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_DEBUG(cls) -> bool:
+    @property
+    def RDF_VALIDATOR_DEBUG(self) -> bool:
         value = strtobool(os.environ.get('RDF_VALIDATOR_DEBUG', 'true'))
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION(cls) -> str:
+    @property
+    def RDF_VALIDATOR_REPORT_TEMPLATE_LOCATION(self) -> str:
         if os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION') \
                 and Path(os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')).exists() \
                 and any(Path(os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')).iterdir()):
             value = os.environ.get('RDF_VALIDATOR_TEMPLATE_LOCATION')
         else:
             value = str(Path(__file__).parents[1] / 'resources/templates/validator_report')
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_REPORT_TITLE(cls) -> Optional[str]:
+    @property
+    def RDF_VALIDATOR_REPORT_TITLE(self) -> Optional[str]:
         value = os.environ.get('RDF_VALIDATOR_REPORT_TITLE', 'SHACL shape validation report').strip('"')
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_UI_NAME(cls) -> Optional[str]:
+    @property
+    def RDF_VALIDATOR_UI_NAME(self) -> Optional[str]:
         value = os.environ.get('RDF_VALIDATOR_UI_NAME', 'RDF Validator').strip('"')
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_SHACL_SHAPES_PATH(cls) -> Optional[str]:
-        value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_PATH')
-        cls.logger.debug(value)
+    @property
+    def RDF_VALIDATOR_SHACL_SHAPES_LOCATION(self) -> Optional[str]:
+        value = os.environ.get('RDF_VALIDATOR_SHACL_SHAPES_LOCATION')
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES(cls) -> bool:
-        if cls.RDF_VALIDATOR_SHACL_SHAPES_PATH:
-            value = strtobool(os.environ.get('RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES', 'true').lower())
-        else:
-            value = True
-        cls.logger.debug(value)
+    @property
+    def RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES(self) -> bool:
+        value = strtobool(os.environ.get('RDF_VALIDATOR_ALLOWS_EXTRA_SHAPES', 'true'))
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_API_SERVICE(cls) -> str:
+    @property
+    def RDF_VALIDATOR_API_SERVICE(self) -> str:
         location = os.environ.get('RDF_VALIDATOR_API_LOCATION', 'http://fingerprinter-api')
         port = os.environ.get('RDF_VALIDATOR_API_PORT', 4010)
         value = f'{location}:{port}'
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_UI_SERVICE(cls) -> str:
+    @property
+    def RDF_VALIDATOR_UI_SERVICE(self) -> str:
         location = os.environ.get('RDF_VALIDATOR_UI_LOCATION', 'http://fingerprinter-ui')
         port = os.environ.get('RDF_VALIDATOR_UI_PORT', 8010)
         value = f'{location}:{port}'
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_API_SECRET_KEY(cls) -> str:
+    @property
+    def RDF_VALIDATOR_API_SECRET_KEY(self) -> str:
         value = os.environ.get('RDF_VALIDATOR_API_SECRET_KEY', 'secret key api')
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
 
-    @classproperty
-    def RDF_VALIDATOR_UI_SECRET_KEY(cls) -> str:
+    @property
+    def RDF_VALIDATOR_UI_SECRET_KEY(self) -> str:
         value = os.environ.get('RDF_VALIDATOR_UI_SECRET_KEY', 'secret key api')
-        cls.logger.debug(value)
+        self.logger.debug(value)
         return value
+
+
+config = ValidatorConfig()
 
 
 class FlaskConfig:

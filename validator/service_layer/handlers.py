@@ -18,7 +18,7 @@ from zipfile import ZipFile
 from eds4jinja2.builders.report_builder import ReportBuilder
 
 from validator.adapters.validator_wrapper import AbstractValidatorWrapper, RDFUnitWrapper
-from validator.config import ValidatorConfig as config
+from validator.config import config
 from validator.entrypoints.api.helpers import TTL_EXTENSION, HTML_EXTENSION, ZIP_EXTENSION
 from validator.service_layer.helpers import create_file_name, get_custom_shacl_shape_files, SHACLShapesMissing
 
@@ -177,7 +177,8 @@ def build_report_from_file(location: str, data_file: str, schema_files: list, ex
                            file_name: str = 'file') -> tuple:
     logger.debug('start building report from file')
 
-    schema_files += get_custom_shacl_shape_files()
+    if config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION:
+        schema_files += get_custom_shacl_shape_files()
     if not schema_files:
         exception_text = f'No SHACL shape files provided for validation'
         logger.exception(exception_text)
@@ -194,7 +195,8 @@ def build_report_from_sparql_endpoint(location: str, endpoint: str, graphs: list
                                       file_name: str = 'file') -> tuple:
     logger.debug('start building report from sparql endpoint')
 
-    schema_files += get_custom_shacl_shape_files()
+    if config.RDF_VALIDATOR_SHACL_SHAPES_LOCATION:
+        schema_files += get_custom_shacl_shape_files()
     if not schema_files:
         exception_text = f'No SHACL shape files provided for validation'
         logger.exception(exception_text)

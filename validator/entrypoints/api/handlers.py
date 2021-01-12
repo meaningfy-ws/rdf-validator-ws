@@ -16,7 +16,7 @@ from flask import send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import InternalServerError
 
-from validator.config import ValidatorConfig as config
+from validator.config import config
 from validator.entrypoints.api.helpers import DEFAULT_REPORT_EXTENSION, check_for_file_exceptions
 from validator.service_layer.handlers import build_report_from_file, build_report_from_sparql_endpoint
 
