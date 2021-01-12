@@ -18,6 +18,8 @@ if config.RDF_VALIDATOR_DEBUG:
 else:
     app.config.from_object(ProductionConfig())
 
+config.set_as_ui_server()
+
 if __name__ == '__main__':
     app.run()
 
