@@ -43,7 +43,7 @@ WHERE
     {% call mc.render_fetch_results(content, error) %}
         {% set substituted_content = replace_strings_in_tabular(content,
                                     target_columns=['focusNode','resultPath','sourceShape', 'resultSeverity',
-                                    'sourceConstraintComponent','value', 'message'],
+                                    'sourceConstraintComponent', 'message'],
                                     value_mapping_dict=inverted_prefixes,
                                     mark_touched_rows=False ) %}
         {# TODO: need a function that adds a relative count column, so that we can see the percentage of classes #}
