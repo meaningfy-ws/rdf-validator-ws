@@ -8,3 +8,4 @@ Flask-Wtf
 rdflib
 python-dotenv
 eds4jinja2
+shortuuid
