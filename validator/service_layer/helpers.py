@@ -7,8 +7,10 @@
 
 """ """
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import List
+
 from shortuuid import ShortUUID
 
 from validator.config import config
@@ -23,7 +25,8 @@ class SHACLShapesMissing(Exception):
 
 
 def create_file_name(file_name_base: str, extension: str, uuid_length: int = 6) -> str:
-    return f'{file_name_base}-{ShortUUID().random(length=uuid_length)}.{extension}'
+    now = datetime.now()
+    return f'{file_name_base}-{now.year}-{now.month}-{now.day}-{ShortUUID().random(length=uuid_length)}.{extension}'
 
 
 def get_custom_shacl_shape_files() -> List[str]:

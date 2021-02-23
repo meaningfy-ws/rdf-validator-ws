@@ -5,6 +5,7 @@
 # Author: Mihai Coșleț
 # Email: coslet.mihai@gmail.com
 import re
+from datetime import datetime
 from unittest.mock import patch
 
 from validator.config import config
@@ -19,10 +20,12 @@ def test_create_report_ttl(tmpdir, monkeypatch):
     extension = TTL_EXTENSION
     monkeypatch.setenv('RDF_VALIDATOR_FILE_NAME_BASE', 'custom-report-name')
     filename = config.RDF_VALIDATOR_FILE_NAME_BASE
+    now = datetime.now()
+
     report_path, report_filename = create_report(location, html_report, ttl_report, extension, filename)
 
     assert report_path == ttl_report
-    assert re.match('^custom-report-name.*ttl$', report_filename)
+    assert re.match(f'^custom-report-name-{now.year}-{now.month}-{now.day}-.*ttl$', report_filename)
 
 
 @patch('validator.service_layer.handlers.prepare_eds4jinja_context')
@@ -36,10 +39,12 @@ def test_create_report_html(mock_generate_validation_report, tmpdir, monkeypatch
     extension = HTML_EXTENSION
     monkeypatch.setenv('RDF_VALIDATOR_FILE_NAME_BASE', 'custom-report-name')
     filename = config.RDF_VALIDATOR_FILE_NAME_BASE
+    now = datetime.now()
+
     report_path, report_filename = create_report(location, html_report, ttl_report, extension, filename)
 
     assert report_path == '/report/location.html'
-    assert re.match('^custom-report-name.*html$', report_filename)
+    assert re.match(f'^custom-report-name-{now.year}-{now.month}-{now.day}-.*html', report_filename)
 
 
 @patch('validator.service_layer.handlers.prepare_eds4jinja_context')
@@ -58,8 +63,9 @@ def test_create_report_zip(mock_generate_validation_report, mock_prepare_eds4jin
     extension = ZIP_EXTENSION
     monkeypatch.setenv('RDF_VALIDATOR_FILE_NAME_BASE', 'custom-report-name')
     filename = config.RDF_VALIDATOR_FILE_NAME_BASE
+    now = datetime.now()
 
     report_path, report_filename = create_report(location, html_report, ttl_report, extension, filename)
 
     assert report_path == str(location) + '/report.zip'
-    assert re.match('^custom-report-name.*zip$', report_filename)
+    assert re.match(f'^custom-report-name-{now.year}-{now.month}-{now.day}-.*zip$', report_filename)
