@@ -7,11 +7,13 @@
 
 """ """
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
+from shortuuid import ShortUUID
+
 from validator.config import config
-from validator.entrypoints.api.helpers import TTL_EXTENSION
 
 logger = logging.getLogger(config.RDF_VALIDATOR_LOGGER)
 
@@ -22,8 +24,9 @@ class SHACLShapesMissing(Exception):
     """
 
 
-def create_file_name(filename: str, file_type: str = TTL_EXTENSION) -> str:
-    return Path(filename).stem + f'-report.{file_type}'
+def create_file_name(file_name_base: str, extension: str, uuid_length: int = 6) -> str:
+    now = datetime.now()
+    return f'{file_name_base}-{now.year}-{now.month}-{now.day}-{ShortUUID().random(length=uuid_length)}.{extension}'
 
 
 def get_custom_shacl_shape_files() -> List[str]:
